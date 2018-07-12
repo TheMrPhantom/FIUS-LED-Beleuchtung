@@ -9,9 +9,10 @@ void method1(){
   
 }
 ```
-Wobei auch hier wieder die Nummer ersetzt werden muss.\
-5. Das Projekt ist in C++ geschrieben, die Methoden für die LEDs sind unten aufgeführt\
-6. Schreibe deine Animation\
+Wobei auch hier wieder die Nummer ersetzt werden muss.
+
+5. Das Projekt ist in C++ geschrieben, die Methoden für die LEDs sind unten aufgeführt
+6. Schreibe deine Animation
 7. Sende einen pull request
 
 ## Mögliche Befehle der LED Libary ([Adafruit Neopixel](https://learn.adafruit.com/adafruit-neopixel-uberguide/arduino-library-use))
