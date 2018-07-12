@@ -1,31 +1,67 @@
 #include <Adafruit_NeoPixel.h>
+#include <WiFi.h>
 #define TOUCH_PIN T2 //connected to 2
 #define PIN 4
-int touch_value = 100;
+
+const char* ssid     = "IchBinDerFiusRaum";
+const char* password = "^2T941o2";
+WiFiServer server(80);
+const int programmMaxIndex = 3;
+
+int pgrNr = 0;
+
+int r1 = 0;
+int r2 = 0;
+
+int g1 = 0;
+int g2 = 0;
+
+int b1 = 0;
+int b2 = 0;
+
+int divide = 50;
+
 long t = 0;
 boolean statusChanged;
-int state = 0;
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(1000, PIN, NEO_GRB + NEO_KHZ800);
+
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(1055, PIN, NEO_GRB + NEO_KHZ800);
 
 void setup()
 {
   statusChanged = true;
-  state = 3;
-Serial.begin(9600);
+  pgrNr = 3;
+  Serial.begin(115200);
   strip.begin();
   refreshLED(); // Initialize all pixels to 'off'
+  WiFi.softAP(ssid, password);
 
+  Serial.println("WiFi connected.");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.softAPIP());
+  server.begin();
 }
 
 void loop()
 {
-  if (checkStatus() || state == 3 || statusChanged) {
+  checkForWlanClient();
+  if (pgrNr == 3 || statusChanged) {
     statusChanged = false;
-    switch (state) {
+    Serial.print("Programm Nr:");
+    Serial.println(pgrNr);
+    switch (pgrNr) {
       case 0:
-        for (int i = 0; i < 400; i++) {
-          strip.setPixelColor(i, 255, 255, 0);
+
+        for (int i = 0; i < strip.numPixels(); i++) {
+          strip.setPixelColor(i, r2, g2, b2);
+        }
+
+        for (int i = 0; i < (int)(405 * (divide / 100.0)); i++) {
+          strip.setPixelColor(i, r1, g1, b1);
+        }
+
+        for (int i = strip.numPixels(); i > strip.numPixels() - (int)(405 * (divide / 100.0)); i--) {
+          strip.setPixelColor(i, r2, g2, b2);
         }
         refreshLED();
         break;
@@ -61,7 +97,7 @@ void rainbowCycle(uint8_t wait) {
   for (j = 0; j < 256 * 5; j++) { // 5 cycles of all colors on wheel
     counter++;
     if (counter > 100) {
-      if (checkStatus()) {
+      if (statusChanged) {
         break;
       }
       counter = 0;
@@ -71,6 +107,7 @@ void rainbowCycle(uint8_t wait) {
     }
     refreshLED();
     delay(wait);
+    checkForWlanClient();
 
   }
 }
@@ -90,33 +127,132 @@ uint32_t Wheel(byte WheelPos) {
   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-boolean checkStatus() {
-
-
-  if (millis() - t > 1000) {
-    touch_value = touchRead(TOUCH_PIN);
-    if (touch_value < 15 ) {
-      t = millis();
-      state++;
-
-      state %= 4;
-
-
-      statusChanged = true;
-      return true;
-    }
-  }
-  return false;
-
-}
-
-
 void refreshLED() {
-  delay(10);
+  delay(2);
   portDISABLE_INTERRUPTS();
-  delay(10);
+  delay(2);
   strip.show();
   portENABLE_INTERRUPTS();
 }
+
+void checkForWlanClient() {
+
+  WiFiClient client = server.available();   // listen for incoming clients
+
+  bool hasReceivedData = false;
+  String data = "";
+  if (client) {                             // if you get a client,
+    // print a message out the serial port
+    String currentLine = "";                // make a String to hold incoming data from the client
+    while (client.connected()) {            // loop while the client's connected
+      if (client.available()) {             // if there's bytes to read from the client,
+        char c = client.read();             // read a byte, then
+
+        if (c == '\n') {                    // if the byte is a newline character
+
+          // if the current line is blank, you got two newline characters in a row.
+          // that's the end of the client HTTP request, so send a response:
+          if (currentLine.length() == 0) {
+            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
+            // and a content-type so the client knows what's coming, then a blank line:
+            client.println("HTTP/1.1 200 OK");
+            client.println("Content-type:text/html");
+            client.println();
+
+            printWebsite(client);
+
+            client.println();
+            // break out of the while loop:
+            break;
+          } else {    // if you got a newline, then clear currentLine:
+            currentLine = "";
+          }
+        } else if (c != '\r') {  // if you got anything else but a carriage return character,
+          currentLine += c;      // add it to the end of the currentLine
+        }
+
+        if (currentLine.endsWith("&last=42") && !hasReceivedData) {
+          data = currentLine;
+
+
+          if (data.startsWith("GET /programm?")) {
+            data.replace("GET /programm?programm=", "");
+            data.replace("&last=42", "");
+            pgrNr = data.toInt();
+            hasReceivedData = true;
+
+          } else if (data.startsWith("GET /rgbChoose?")) {
+            data.replace("GET /rgbChoose?", "");
+            data.replace("&last=42", "");
+
+            r1 = split(data, 0, '&').substring(3).toInt();
+            r2 = split(data, 4, '&').substring(3).toInt();
+
+            g1 = split(data, 1, '&').substring(3).toInt();
+            g2 = split(data, 5, '&').substring(3).toInt();
+
+            b1 = split(data, 2, '&').substring(3).toInt();
+            b2 = split(data, 6, '&').substring(3).toInt();
+
+            divide = split(data, 3, '&').substring(8).toInt();
+            hasReceivedData = true;
+          } else if (data.startsWith("GET /syncRGB?")) {
+            divide = 50;
+            r2 = r1;
+            g2 = g1;
+            b2 = b1;
+            hasReceivedData = true;
+          }
+
+        }
+      }
+    }
+    // close the connection:
+    client.stop();
+  }
+
+
+  if (hasReceivedData) {
+    hasReceivedData = false;
+
+    statusChanged = true;
+
+    if (data.startsWith("GET /programm?")) {
+
+
+    } else if (data.startsWith("GET /rgbChoose?")) {
+
+
+    } else if (data.startsWith("GET /syncRGB?")) {
+
+    }
+  }
+}
+
+String split(String data, int index, char character) {
+
+  int commaIndex = data.indexOf(character);
+  int secondCommaIndex = data.indexOf(character, commaIndex + 1);
+  for (int i = 0; i < index - 1; i++) {
+
+    commaIndex = secondCommaIndex;
+    secondCommaIndex = data.indexOf(character, commaIndex + 1);
+  }
+
+  if (index == 0) {
+    data.remove(commaIndex);
+  } else  {
+    return data.substring(commaIndex + 1, secondCommaIndex);
+  }
+
+  return data;
+}
+
+
+
+
+
+
+
 
 
