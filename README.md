@@ -1,4 +1,3 @@
-# FIUS-LED-Beleuchtung
 # How-To Animationen für LEDs
 1. Clone das Projekt
 2. Importiere das Projekt in die Arduino IDE
