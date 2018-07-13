@@ -128,9 +128,9 @@ uint32_t Wheel(byte WheelPos) {
 }
 
 void refreshLED() {
-  delay(2);
+  delay(10);
   portDISABLE_INTERRUPTS();
-  delay(2);
+  delay(10);
   strip.show();
   portENABLE_INTERRUPTS();
 }
