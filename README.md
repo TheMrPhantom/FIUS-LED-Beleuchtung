@@ -1,6 +1,7 @@
 # How-To Animationen für LEDs
 1. Clone das Projekt
 2. Importiere das Projekt in die [Arduino IDE](https://www.arduino.cc/en/Main/Software)
+3. Installiere die Adafruit Neopixel Libary unter Sketch>Bibliothek einbinden>Bibliotheken verwalten
 3. Erstelle einen neuen Tab für die Animation\
 Der Name muss wie folgt aussehen: Method\<nummer\>.ini, wobei \<nummer\> durch die letze Nummer der Methoden + 1 ersetzt werden muss.
 4. Im neuen Tab **muss** eine Methode erstellt werden, die wie folgt aussieht:
