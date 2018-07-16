@@ -42,7 +42,7 @@ RgbColor IdToColor(int32_t id) {
 
 void RandomLeds(int32_t group_count) {
     for (int32_t group = 0; group < group_count; ++group) {
-        RgbColor color = IdToColor(RandomInt(0, 256 * 2));
+        RgbColor color = IdToColor(RandomInt(0, 255 * 2));
         int32_t first_pixel = kPixelCount * group / group_count;
         int32_t last_pixel = kPixelCount * (group + 1) / group_count - 1;
         led_strip->SetColors(first_pixel, last_pixel, color);
@@ -75,12 +75,14 @@ void DisplayColorIds(const std::vector<int32_t> &ids) {
     }
 }
 
-void BubbleSortStep(std::vector<int32_t> &ids) {
-    static int32_t current_group = 0;
-    static int32_t max_group = 0;
-    static bool changed = false;
-    if (max_group == 0) {
+void BubbleSortStep(std::vector<int32_t> &ids, bool initialized) {
+    static int32_t current_group;
+    static int32_t max_group;
+    static bool changed;
+    if (!initialized) {
+        current_group = 0;
         max_group = static_cast<int32_t>(ids.size()) - 1;
+        changed = false;
     }
     if (ids[current_group] > ids[current_group + 1]) {
         std::swap(ids[current_group], ids[current_group + 1]);
@@ -88,11 +90,11 @@ void BubbleSortStep(std::vector<int32_t> &ids) {
     }
     ++current_group;
     if (current_group == max_group) {
-        current_group = 0;
-        --max_group;
         if (!changed) {
             current_state = State::SLEEP;
         } else {
+            current_group = 0;
+            --max_group;
             changed = false;
         }
     }
@@ -106,8 +108,9 @@ void UpdateBubbleSort() {
         for (auto &id : ids) {
             id = RandomInt(0, 512);
         }
+        BubbleSortStep(ids, false);
     } else {
-        BubbleSortStep(ids);
+        BubbleSortStep(ids, true);
     }
     DisplayColorIds(ids);
 }
