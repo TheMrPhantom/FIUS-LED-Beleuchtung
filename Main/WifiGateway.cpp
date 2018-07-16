@@ -3,8 +3,8 @@
 static const char *const kWifiSsid = "Chroma";
 static const char *const kWifiPassword = "partyraum";
 
-WifiGateway::WifiGateway(LedController &ledController)
-    : wifiServer_{80}, ledController_{ledController} {
+WifiGateway::WifiGateway(std::function<void()> Callback)
+    : wifiServer_{80}, Callback_{Callback} {
     WiFi.softAP(kWifiSsid, kWifiPassword);
     wifiServer_.begin();
     Serial.print("WiFi connected. IP address: ");
@@ -31,15 +31,15 @@ void WifiGateway::Update() {
                 currentLine = "";
                 continue;
             }
-            ledController_.SetTicksLeftActive(80);
             client.println("HTTP/1.1 200 OK");
             client.println("Content-Type: text/html");
             client.println("Connection: close");
             client.println();
-            client.println("Set ticksLeftActive to 150.");
+            client.println("Hello, World!.");
             Serial.println("Answered request.");
         }
         client.stop();
         Serial.println("Connection closed.");
+        Callback_();
     }
 }
