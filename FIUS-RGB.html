@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FIUS RGB</title>
+</head>
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" id="webrtc-control">
+    $(document).ready(function() {
+        jQuery("body").css("padding", "0");
+        jQuery("body").css("margin", "0 auto");
+
+        var slider = document.getElementById("r1");
+        var output = document.getElementById("valueR1");
+        output.innerHTML = slider.value + "%"; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function() {
+            output.innerHTML = this.value + "%";
+        }
+
+        var slider2 = document.getElementById("g1");
+        var output2 = document.getElementById("valueG1");
+        output2.innerHTML = slider2.value + "%"; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider2.oninput = function() {
+            output2.innerHTML = this.value + "%";
+        }
+
+        var slider3 = document.getElementById("b1");
+        var output3 = document.getElementById("valueB1");
+        output3.innerHTML = slider3.value + "%"; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider3.oninput = function() {
+            output3.innerHTML = this.value + "%";
+        }
+
+        var sliderDivider = document.getElementById("divider");
+        var outputDivider = document.getElementById("valueDivider");
+        outputDivider.innerHTML = sliderDivider.value + "%"; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        sliderDivider.oninput = function() {
+            outputDivider.innerHTML = this.value + "%";
+        }
+
+        var slider4 = document.getElementById("r2");
+        var output4 = document.getElementById("valueR2");
+        output4.innerHTML = slider4.value + "%"; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider4.oninput = function() {
+            output4.innerHTML = this.value + "%";
+        }
+
+        var slider5 = document.getElementById("g2");
+        var output5 = document.getElementById("valueG2");
+        output5.innerHTML = slider5.value + "%"; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider5.oninput = function() {
+            output5.innerHTML = this.value + "%";
+        }
+
+        var slider6 = document.getElementById("b2");
+        var output6 = document.getElementById("valueB2");
+        output6.innerHTML = slider6.value + "%"; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider6.oninput = function() {
+            output6.innerHTML = this.value + "%";
+        }
+
+
+        jQuery('<div class="quantity-nav"><div class="quantity-button quantity-up">+</div><div class="quantity-button quantity-down">-</div></div>').insertAfter('.quantity input');
+        jQuery('.quantity').each(function () {
+            var spinner = jQuery(this),
+                input = spinner.find('input[type="number"]'),
+                btnUp = spinner.find('.quantity-up'),
+                btnDown = spinner.find('.quantity-down'),
+                min = input.attr('min'),
+                max = input.attr('max');
+
+            btnUp.click(function () {
+                var oldValue = parseFloat(input.val());
+                if (oldValue >= max) {
+                    var newVal = oldValue;
+                } else {
+                    var newVal = oldValue + 1;
+                }
+                spinner.find("input").val(newVal);
+                spinner.find("input").trigger("change");
+            });
+
+            btnDown.click(function () {
+                var oldValue = parseFloat(input.val());
+                if (oldValue <= min) {
+                    var newVal = oldValue;
+                } else {
+                    var newVal = oldValue - 1;
+                }
+                spinner.find("input").val(newVal);
+                spinner.find("input").trigger("change");
+            });
+
+        });
+        
+        if (navigator.userAgent.search("Firefox") >= 0) {
+            jQuery(".quantity-nav").css("float", "left");
+            jQuery(".quantity-nav").css("position", "relative");
+        }else{
+            jQuery(".quantity-nav").css("position", "absolute");
+            jQuery(".quantity-nav").css("margin-left", "65px");
+        }
+        
+    })
+</script>
+
+    <style>
+
+
+        
+        main {
+            font-size: 99%;
+            font-family: "Arial", sans-serif ;
+            line-height: 1.5;
+            text-align: center;
+            margin: 0 auto;
+            width: 80%;
+            clear: both;
+        }
+
+        .choose{
+            display: flex;
+            flex-flow: column;
+        }
+
+        .counterWrapper{
+            width: 60px;
+            margin: 0 auto;
+        }
+        
+
+        .quantity{
+            position: relative;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button
+        {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number]
+        {
+            -moz-appearance: textfield;
+        }
+
+        .quantity input {
+            width: 45px;
+            height: 42px;
+            line-height: 1.65;
+            float: left;
+            display: block;
+            padding: 0;
+            margin: 0;
+            padding-left: 20px;
+            border: 1px solid #eee;
+        }
+
+        .quantity input:focus {
+            outline: 0;
+        }
+
+        .quantity-nav {
+            height: 42px;
+        }
+
+        .quantity-button {
+            position: relative;
+            cursor: pointer;
+            border-left: 1px solid #eee;
+            width: 20px;
+            text-align: center;
+            color: #333;
+            font-size: 13px;
+            font-family: "Trebuchet MS", Helvetica, sans-serif !important;
+            line-height: 1.7;
+            -webkit-transform: translateX(-100%);
+            transform: translateX(-100%);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+
+        .quantity-button.quantity-up {
+            position: absolute;
+            height: 50%;
+            top: 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .quantity-button.quantity-down {
+            position: absolute;
+            bottom: -1px;
+            height: 50%;
+        }
+
+        #programmChoose .submitWrapper{
+            margin-top: 20px;
+        }
+
+        #programmChoose .button {
+            background-color: lightblue;
+            border: none;
+            color: white;
+            padding: 10px 10px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        #codeArea {
+            margin: 20px 0 20px 0;
+        }
+
+        #codeArea .submitWrapper {
+            margin-top: 20px;
+        }
+
+        #codeArea .button {
+            background-color: lightblue;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        #rgbSettings{
+            width: 80%;
+            display: flex;
+            flex-flow: row;
+            margin: auto;
+            margin-top: 5%;
+        }
+
+        #rgbSettings #chooserForms{
+            order: 1;
+            width: 60%;
+        }
+
+        #rgbSettings #chooserForms .range{
+            margin: 10px 0 10px 0;
+        }
+
+        #rgbSettings #chooserForms .divider{
+            margin: 60px 0 60px 0;
+        }
+
+        #rgbSettings #submits{
+            order: 2;
+            width: 40%;
+            display: flex;
+            flex-flow: column;
+            margin: 115px 0 0 0;
+        }
+
+        #rgbSettings .button {
+            margin: 30px 30px 0 30px;
+            background-color: lightblue;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        #rgbSettings .button:hover, #programmChoose .button:hover, #codeArea .button:hover {
+            background-color: dodgerblue;
+        }
+
+        #rgbSettings .button:active, #programmChoose .button:active, #codeArea .button:active{
+            background-color: darkblue;
+        }
+
+        #rgbSettings .rgbChoose{
+            display: flex;
+            flex-flow: column;
+        }
+
+        .hidden, .syncRGB{
+            display: none;
+        }
+
+
+        .slider {
+            -webkit-appearance: none;
+            width: 60%;
+            float: left;
+            height: 10px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 30%;
+            background: lightskyblue;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 30%;
+            background: lightskyblue;
+            cursor: pointer;
+        }
+
+        @media only screen and (max-width: 650px) {
+            main {
+                paddin: 0;
+                margin: 0 auto;
+                width: 100%;
+            }
+
+            #rgbSettings{
+                width: 100%;
+                flex-flow: column;
+            }
+
+            #rgbSettings #chooserForms{
+                width: 100%;
+            }
+
+            #rgbSettings #chooserForms .range{
+                margin: 10px 0 10px 0;
+            }
+
+            #rgbSettings #chooserForms .divider{
+                margin: 60px 0 60px 0;
+            }
+
+            #rgbSettings #submits{
+                width: 100%;
+            }
+
+            #codeInput{
+                width: 95%;
+                height: 200px;
+            }
+
+        }
+
+
+    </style>
+
+    <main>
+        <h1>FIUS RGB</h1>
+        <div id="programmChoose">
+            <form action="http://192.168.137.33/programm" method="get" class="choose">
+                <div class="counterWrapper">Prg. Nr.:
+                    <label class="quantity">
+                        <input id="stepRanger" type="number" name="programm" step="0" max="100" value="0">
+                    </label>
+                </div>
+
+                <input type="hidden" name="last" value="42" />
+                <div class="submitWrapper">
+                    <label class="button" for="button">
+                        <input id="button" class="hidden" type="submit"/>Auswählen
+                    </label>
+                </div>
+
+            </form>
+        </div>
+        <div id="rgbSettings">
+            <div id="chooserForms">
+                <form action="http://192.168.137.33/rgbChoose" method="get" class="rgbChoose">
+                    <label class="range">
+                        <input type="range" name="r1" min="0" max="100" value="50" class="slider" id="r1">R
+                        <span id="valueR1"></span>
+                    </label>
+                    <label class="range">
+                        <input type="range" name="g1" min="1" max="100" value="50" class="slider" id="g1">G
+                        <span id="valueG1"></span>
+                    </label>
+                    <label class="range">
+                        <input type="range" name="b1" min="1" max="100" value="50" class="slider" id="b1">B
+                        <span id="valueB1"></span>
+                    </label>
+
+                    <label class="divider">
+                        <input type="range" name="divider" min="1" max="100" value="50" class="slider" id="divider"> Teilung
+                        <span id="valueDivider"></span>
+                    </label>
+
+                    <label class="range">
+                        <input type="range" name="r2" min="1" max="100" value="50" class="slider" id="r2">R
+                        <span id="valueR2"></span>
+                    </label>
+                    <label class="range">
+                        <input type="range" name="g2" min="1" max="100" value="50" class="slider" id="g2">G
+                        <span id="valueG2"></span>
+                    </label>
+                    <label class="range">
+                        <input type="range" name="b2" min="1" max="100" value="50" class="slider" id="b2">B
+                        <span id="valueB2"></span>
+                    </label>
+                    <input type="hidden" name="last" value="42" />
+                    <input type="submit" id="submit-form2" class="hidden" />
+                </form>
+
+
+            </div>
+            <div id="submits">
+                <label class="button" for="submit-form2" tabindex="0">Submit</label>
+                <form action="http://192.168.137.33/syncRGB" method="get" class="syncRGB">
+                    <input name="syncRGB" type="text" value="syncRGB"/>
+                    <input type="hidden" name="last" value="42" />
+                    <input type="submit" id="submit-form3" class="hidden" />
+                </form>
+                <label class="button" for="submit-form3" tabindex="0">Sync</label>
+            </div>
+
+
+
+        </div>
+        <div id="codeArea">
+            <form action="http://192.168.137.33/code" method="get" class="code">
+                <label class="textArea"><h3>Code:</h3>
+                    <textarea id="codeInput" name="codeInput" rows="25" cols="150">
+
+                 </textarea>
+                </label>
+
+                <input type="hidden" name="last" value="42" />
+                <div class="submitWrapper">
+                    <label class="button" for="scriptButton">
+                        <input id="scriptButton" class="hidden" type="submit"/>Script ausführen
+                    </label>
+                </div>
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>
