@@ -90,6 +90,13 @@ void Meteor::Update() {
     int pos = meteorPos[i] / 100;
     RgbColor color = meteorColor[i];
     strip->SetColor(pos, color);
+    if (meteorDir[i] == -1) {
+      if (pos + 1 < strip->PixelCount())
+        strip->SetColor(pos + 1, color);
+    } else {
+      if (pos - 1 > 0)
+        strip->SetColor(pos - 1, color);
+    }
   }
 
   /* Fade the meteor linear */
