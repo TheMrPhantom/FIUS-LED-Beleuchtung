@@ -1,6 +1,7 @@
 #include "LedStrip.hpp"
 #include "Util.hpp"
 #include "WifiGateway.hpp"
+#include "Meteor.hpp"
 
 #include <vector>
 
@@ -16,6 +17,8 @@ bool state_initialized = false;
 std::unique_ptr<LedStrip> led_strip;
 std::unique_ptr<WifiGateway> wifi_gateway;
 
+Meteor *meteor;
+
 void IncrementState() {
   current_state =
     static_cast<State>((static_cast<int>(current_state) + 1) % kStateCount);
@@ -26,7 +29,7 @@ void setup() {
   Serial.begin(115200);
   led_strip = make_unique<LedStrip>(kPixelCount, kPin);
   wifi_gateway = make_unique<WifiGateway>(IncrementState);
-  UpdateMeteor(true);
+  meteor = new Meteor(led_strip.get());
 }
 
 int32_t ColorToId(RgbColor color) {
@@ -116,119 +119,6 @@ void UpdateBubbleSort() {
   DisplayColorIds(ids);
 }
 
-const int meteorCount = 6; // Number of meteors
-int meteorSpeed[meteorCount]; // The speed of the meteors
-int meteorPos[meteorCount]; // The position [0, Num Pixels * 100]
-int meteorDir[meteorCount]; // -1 = backward 1= forward
-int meteorSwitch[meteorCount];
-RgbColor meteorColor[meteorCount]; // The colors of the meteors
-long timeDif;
-
-void UpdateMeteor(bool init) {
-  if (init) {
-    timeDif = 0;
-
-    /* Initializes the meteor attributes */
-    for (int i = 0; i < meteorCount; i++) {
-      meteorPos[i] = RandomInt(0, led_strip->PixelCount() * 100);
-    }
-
-
-    for (int i = 0; i < meteorCount; i++) {
-      meteorSpeed[i] = RandomInt(50, 101);
-    }
-
-    for (int i = 0; i < meteorCount; i++) {
-      meteorSwitch[i] = 0;
-    }
-
-    for (int i = 0; i < meteorCount; i++) {
-      meteorDir[i] = 0;
-      do {
-        meteorDir[i] = RandomInt(-1, 2);
-      } while (meteorDir[i] == 0);
-    }
-
-    for (int i = 0; i < meteorCount; i++) {
-      meteorColor[i] = RgbColor(RandomInt(0, 256), RandomInt(0, 256), RandomInt(0, 256));
-    }
-
-  } else {
-    if (millis() - timeDif < 17) {
-      return;
-    } else {
-      timeDif = millis();
-    }
-
-Serial.println(millis()%17);
-    
-    /* Moves the meteors */
-    for (int i = 0; i < meteorCount; i++) {
-      if (meteorDir[i] == -1) {
-        meteorPos[i] -= meteorSpeed[i];
-      } else {
-        meteorPos[i] += meteorSpeed[i];
-      }
-      for (int x = 0; x < meteorCount; x++) {
-        if (meteorPos[x] / 100 == meteorPos[i] / 100 && x != i) {
-          if (meteorSwitch[i] == 0 || meteorSwitch[x] == 0) {
-
-            if (meteorDir[x] == -1) {
-              meteorDir[x] = 1;
-            } else {
-              meteorDir[x] = -1;
-            }
-            if (meteorDir[i] == -1) {
-              meteorDir[i] = 1;
-            } else {
-              meteorDir[i] = -1;
-            }
-            meteorSwitch[i] = 5;
-            meteorSwitch[x] = 5;
-
-          }
-        }
-      }
-    }
-  }
-
-  for (int x = 0; x < meteorCount; x++) {
-    if (meteorSwitch[x] > 0) {
-
-      meteorSwitch[x]--;
-    }
-
-  }
-
-  /* Checks if meteors reached end*/
-  for (int x = 0; x < meteorCount; x++) {
-    if (meteorPos[x] / 100 > led_strip->PixelCount() - 2 || meteorPos[x] / 100 < 2) {
-      if (meteorDir[x] == -1) {
-        meteorDir[x] = 1;
-      } else {
-        meteorDir[x] = -1;
-      }
-    }
-
-  }
-
-  /* Paint head of meteor */
-  for (int i = 0; i < meteorCount; i++) {
-    int pos = meteorPos[i] / 100;
-    RgbColor color = meteorColor[i];
-    led_strip->SetColor(pos, color);
-  }
-
-  /* Fade the meteor linear */
-  for (int i = 0; i < led_strip->PixelCount(); i++) {
-    RgbColor color = led_strip -> GetColor(i);
-    color.Darken(5);
-    led_strip->SetColor(i, color);
-  }
-
-}
-
-
 void UpdateLeds() {
   switch (current_state) {
     case State::WHITE:
@@ -241,7 +131,7 @@ void UpdateLeds() {
       UpdateBubbleSort();
       break;
     case State::METEOR:
-      UpdateMeteor(false);
+      meteor->Update();
       break;
   }
   state_initialized = true;
