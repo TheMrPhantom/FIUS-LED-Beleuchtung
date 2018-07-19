@@ -15,8 +15,6 @@ void Meteor::Update() {
     timeDif = millis();
   }
 
-
-
   /* Moves the meteors */
   for (int i = 0; i < meteorCount; i++) {
     if (meteorDir[i] == -1) {
@@ -96,10 +94,20 @@ void Meteor::Update() {
 
   /* Fade the meteor linear */
   for (int i = 0; i < strip->PixelCount(); i++) {
-    RgbColor color = strip -> GetColor(i);
-    color.Darken(5);
-    strip->SetColor(i, color);
+    RgbColor c = strip->GetColor(i);
+    if (c.R != 10 && c.G != 10 && c.B != 10) {
+
+
+
+      c.Darken(5);
+      strip->SetColor(i, c);
+    } else {
+      strip->SetColor(i, backgroundColor);
+    }
   }
+
+  PrintVoid();
+
 }
 
 void Meteor:: Respawn(int meteorNumber) {
@@ -120,7 +128,7 @@ void Meteor:: Respawn(int meteorNumber) {
 
 void Meteor:: Initialize() {
   timeDif = 0;
-
+  backgroundColor = RgbColor(10, 10, 10);
   /* Initializes the meteor attributes */
   for (int i = 0; i < meteorCount; i++) {
     meteorPos[i] = RandomInt(0, strip->PixelCount() * 100);
@@ -149,5 +157,14 @@ void Meteor:: Initialize() {
     meteorColor[i] = RgbColor(RandomInt(0, 256), RandomInt(0, 256), RandomInt(0, 256));
   }
 
+}
+
+void Meteor::PrintVoid() {
+  for (int i = 0; i < strip->PixelCount(); i++) {
+    RgbColor c = strip->GetColor(i);
+    if (c.R == 0 && c.G == 0 && c.B == 0) {
+      strip->SetColor(i, backgroundColor);
+    }
+  }
 }
 

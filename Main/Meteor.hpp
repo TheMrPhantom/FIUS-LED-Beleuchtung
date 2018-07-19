@@ -7,9 +7,11 @@ class Meteor {
 
   private:
     void Respawn(int meteorNumber);
+    void PrintVoid();
     void Initialize();
 
     static const int meteorCount = 7; // Number of meteors
+    RgbColor backgroundColor;
     int meteorSpeed[meteorCount]; // The speed of the meteors
     int meteorPos[meteorCount]; // The position [0, Num Pixels * 100]
     int meteorDir[meteorCount]; // -1 = backward 1= forward
