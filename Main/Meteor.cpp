@@ -7,6 +7,7 @@ Meteor::Meteor(LedStrip *led_strip) : strip(led_strip) {
   Initialize();
 }
 
+
 void Meteor::Update() {
 
   if (millis() - timeDif < 17) {
@@ -15,7 +16,17 @@ void Meteor::Update() {
     timeDif = millis();
   }
 
-  /* Moves the meteors */
+  MoveMeteors();
+  CheckReadEnd();
+  CheckBeacon();
+  PaintHead();
+  FadeMeteors();
+  PrintVoid();
+  PrintBeacon();
+}
+
+void Meteor::MoveMeteors() {
+
   for (int i = 0; i < meteorCount; i++) {
     if (meteorDir[i] == -1) {
       meteorPos[i] -= meteorSpeed[i];
@@ -23,7 +34,7 @@ void Meteor::Update() {
       meteorPos[i] += meteorSpeed[i];
     }
     for (int x = 0; x < meteorCount; x++) {
-      if (abs(meteorPos[x] / 100 - meteorPos[i] / 100) < 3 && x != i) {
+      if (((abs(meteorPos[x] / 100 - meteorPos[i] / 100) < 3) || (abs(meteorPos[x] / 100 - meteorPos[i] / 100) < 5 && (meteorLife[x] > 20 || meteorLife[i] > 20))) && x != i) {
         if (meteorSwitch[i] == 0 || meteorSwitch[x] == 0) {
 
           if (meteorDir[i] != meteorDir[x]) {
@@ -44,7 +55,6 @@ void Meteor::Update() {
             meteorLife[i] -= 1;
             meteorLife[x] -= 1;
 
-
             meteorSpeed[i] = meteorLife[i] * 10;
             meteorSpeed[x] = meteorLife[x] * 10;
 
@@ -62,18 +72,28 @@ void Meteor::Update() {
         }
       }
     }
+    if (beacon != -1) {
+      if (beaconSaveSpawn > 0) {
+        if (abs(meteorPos[i] / 100 - beacon) < 6) {
+          if (meteorDir[i] == -1) {
+            meteorDir[i] = 1;
+          } else {
+            meteorDir[i] = -1;
+          }
+          meteorSwitch[i] = 5;
+        }
+      }
+    }
   }
-
 
   for (int x = 0; x < meteorCount; x++) {
     if (meteorSwitch[x] > 0) {
-
       meteorSwitch[x]--;
     }
-
   }
+}
 
-  /* Checks if meteors reached end*/
+void Meteor::CheckReadEnd() {
   for (int x = 0; x < meteorCount; x++) {
     if (meteorPos[x] / 100 > strip->PixelCount() - 2 || meteorPos[x] / 100 < 2) {
       if (meteorDir[x] == -1) {
@@ -82,10 +102,27 @@ void Meteor::Update() {
         meteorDir[x] = -1;
       }
     }
-
   }
+}
 
-  /* Paint head of meteor */
+void Meteor::CheckBeacon() {
+  if (beacon != -1 ) {
+    if (beaconSaveSpawn < 0) {
+      for (int i = 0; i < meteorCount; i++) {
+        if (abs(meteorPos[i] / 100 - beacon) < 5) {
+          meteorLife[i] = MAX_SPEED;
+          meteorSpeed[i] = meteorLife[i] * 10;
+          beacon = -1;
+          break;
+        }
+      }
+    } else {
+      beaconSaveSpawn--;
+    }
+  }
+}
+
+void Meteor::PaintHead() {
   for (int i = 0; i < meteorCount; i++) {
     int pos = meteorPos[i] / 100;
     RgbColor color = meteorColor[i];
@@ -102,24 +139,20 @@ void Meteor::Update() {
         strip->SetColor(pos - 2, color);
     }
   }
+}
 
-  /* Fade the meteor linear */
+void Meteor::FadeMeteors() {
   for (int i = 0; i < strip->PixelCount(); i++) {
     RgbColor c = strip->GetColor(i);
     if (c.R != 10 && c.G != 10 && c.B != 10) {
-
-
-
       c.Darken(5);
       strip->SetColor(i, c);
     } else {
       strip->SetColor(i, backgroundColor);
     }
   }
-
-  PrintVoid();
-
 }
+
 
 void Meteor:: Respawn(int meteorNumber) {
   if (meteorLife[meteorNumber] == 0) {
@@ -131,7 +164,7 @@ void Meteor:: Respawn(int meteorNumber) {
       meteorPos[meteorNumber] = 500;
     }
 
-    meteorColor[meteorNumber] = RgbColor(RandomInt(0, 256), RandomInt(0, 256), RandomInt(0, 256));
+    meteorColor[meteorNumber] = RgbColor(RandomInt(40, 256), RandomInt(40, 256), RandomInt(40, 256));
     meteorSpeed[meteorNumber] = meteorLife[meteorNumber] * 10;
 
   }
@@ -139,6 +172,7 @@ void Meteor:: Respawn(int meteorNumber) {
 
 void Meteor:: Initialize() {
   timeDif = 0;
+  beaconTime = 0;
   beacon = -1;
   backgroundColor = RgbColor(10, 10, 10);
   /* Initializes the meteor attributes */
@@ -177,6 +211,31 @@ void Meteor::PrintVoid() {
     if (c.R == 0 && c.G == 0 && c.B == 0) {
       strip->SetColor(i, backgroundColor);
     }
+  }
+}
+
+void Meteor::PrintBeacon() {
+  if (millis() - beaconTime > beaconSpawnTime) {
+    beaconTime = millis();
+    beacon = RandomInt(10, strip->PixelCount() - 10);
+    beaconSaveSpawn = 600;
+  }
+
+  if (beacon != -1) {
+    if (beaconSaveSpawn < 0) {
+      for (int i = beacon - 5; i < beacon + 5; i++) {
+        strip->SetColor(i, colorByID(beaconColor));
+      }
+    } else {
+      for (int i = beacon - 5; i < beacon + 5; i++) {
+        strip->SetColor(i, colorByID(beaconColor));
+      }
+      strip->SetColor(beacon - 6, RgbColor(255, 255, 255));
+      strip->SetColor(beacon - 7, RgbColor(255, 255, 255));
+      strip->SetColor(beacon + 5, RgbColor(255, 255, 255));
+      strip->SetColor(beacon + 6, RgbColor(255, 255, 255));
+    }
+    beaconColor += 4;
   }
 }
 

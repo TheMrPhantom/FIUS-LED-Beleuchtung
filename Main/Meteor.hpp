@@ -7,11 +7,22 @@ class Meteor {
     void Update();
 
   private:
-    void Respawn(int meteorNumber);
-    void PrintVoid();
+
     void Initialize();
 
+    void MoveMeteors();
+    void CheckReadEnd();
+    void CheckBeacon();
+    void PaintHead();
+    void FadeMeteors();
+    void PrintBeacon();
+    void Respawn(int meteorNumber);
+    void PrintVoid();
+
+    RgbColor colorByID(byte colorNumber);
+
     static const int meteorCount = 7; // Number of meteors
+    static const int beaconSpawnTime = 60000;
     RgbColor backgroundColor;
     int meteorSpeed[meteorCount]; // The speed of the meteors
     int meteorPos[meteorCount]; // The position [0, Num Pixels * 100]
@@ -19,8 +30,10 @@ class Meteor {
     int meteorSwitch[meteorCount]; // Attribute to stop meteors from switching to often
     RgbColor meteorColor[meteorCount]; // The colors of the meteors
     int meteorLife[meteorCount]; // The life points of the meteor
-    RgbColor colorByID(byte colorNumber);
     long timeDif;
+    long beaconTime;
     LedStrip *strip;
     int beacon;
+    int beaconSaveSpawn;
+    byte beaconColor;
 };
