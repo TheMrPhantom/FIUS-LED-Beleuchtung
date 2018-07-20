@@ -2,6 +2,7 @@
 
 class Meteor {
   public:
+    static const int MAX_SPEED = 30;
     Meteor(LedStrip *strip);
     void Update();
 
@@ -18,7 +19,8 @@ class Meteor {
     int meteorSwitch[meteorCount]; // Attribute to stop meteors from switching to often
     RgbColor meteorColor[meteorCount]; // The colors of the meteors
     int meteorLife[meteorCount]; // The life points of the meteor
+    RgbColor colorByID(byte colorNumber);
     long timeDif;
     LedStrip *strip;
-
+    int beacon;
 };

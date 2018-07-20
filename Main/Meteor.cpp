@@ -52,8 +52,8 @@ void Meteor::Update() {
             Respawn(i);
           } else {
             meteorLife[i] += meteorLife[x];
-            if (meteorLife[i] > 20) {
-              meteorLife[i] = 20;
+            if (meteorLife[i] > Meteor::MAX_SPEED) {
+              meteorLife[i] = Meteor::MAX_SPEED;
             }
             meteorSpeed[i] = meteorLife[i] * 10;
             meteorLife[x] = 0;
@@ -93,9 +93,13 @@ void Meteor::Update() {
     if (meteorDir[i] == -1) {
       if (pos + 1 < strip->PixelCount())
         strip->SetColor(pos + 1, color);
+      if (pos + 2 < strip->PixelCount() && meteorSpeed[i] > 20)
+        strip->SetColor(pos + 2, color);
     } else {
       if (pos - 1 > 0)
         strip->SetColor(pos - 1, color);
+      if (pos - 2 > 0 && meteorSpeed[i] > 20)
+        strip->SetColor(pos - 2, color);
     }
   }
 
@@ -135,6 +139,7 @@ void Meteor:: Respawn(int meteorNumber) {
 
 void Meteor:: Initialize() {
   timeDif = 0;
+  beacon = -1;
   backgroundColor = RgbColor(10, 10, 10);
   /* Initializes the meteor attributes */
   for (int i = 0; i < meteorCount; i++) {
@@ -175,3 +180,15 @@ void Meteor::PrintVoid() {
   }
 }
 
+RgbColor Meteor::colorByID(byte colorNumber) {
+  colorNumber = 255 - colorNumber;
+  if (colorNumber < 85) {
+    return RgbColor(255 - colorNumber * 3, 0, colorNumber * 3);
+  }
+  if (colorNumber < 170) {
+    colorNumber -= 85;
+    return RgbColor(0, colorNumber * 3, 255 - colorNumber * 3);
+  }
+  colorNumber -= 170;
+  return RgbColor(colorNumber * 3, 255 - colorNumber * 3, 0);
+}
