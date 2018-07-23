@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LedStrip.hpp"
+
 class Meteor {
   public:
     static const int MAX_SPEED = 30;
@@ -7,7 +9,6 @@ class Meteor {
     void Update();
 
   private:
-
     void Initialize();
 
     void MoveMeteors();
@@ -24,15 +25,16 @@ class Meteor {
     static const int meteorCount = 7; // Number of meteors
     static const int beaconSpawnTime = 60000;
     RgbColor backgroundColor;
-    int meteorSpeed[meteorCount]; // The speed of the meteors
-    int meteorPos[meteorCount]; // The position [0, Num Pixels * 100]
-    int meteorDir[meteorCount]; // -1 = backward 1= forward
-    int meteorSwitch[meteorCount]; // Attribute to stop meteors from switching to often
+    int meteorSpeed[meteorCount];  // The speed of the meteors
+    int meteorPos[meteorCount];    // The position [0, Num Pixels * 100]
+    int meteorDir[meteorCount];    // -1 = backward 1= forward
+    int meteorSwitch[meteorCount]; // Attribute to stop meteors from switching
+                                   // to often
     RgbColor meteorColor[meteorCount]; // The colors of the meteors
-    int meteorLife[meteorCount]; // The life points of the meteor
+    int meteorLife[meteorCount];       // The life points of the meteor
     long timeDif;
     long beaconTime;
-    LedStrip *strip;
+    LedStrip *const strip;
     int beacon;
     int beaconSaveSpawn;
     byte beaconColor;
