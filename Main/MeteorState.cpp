@@ -1,9 +1,11 @@
-#include "Meteor.hpp"
+#include "MeteorState.hpp"
 #include "Util.hpp"
 
-Meteor::Meteor(LedStrip *led_strip) : strip(led_strip) { Initialize(); }
+MeteorState::MeteorState(LedStrip &led_strip) : strip(led_strip) {
+    Initialize();
+}
 
-void Meteor::Update() {
+void MeteorState::Update() {
     if (millis() - timeDif < 17) {
         return;
     } else {
@@ -19,7 +21,7 @@ void Meteor::Update() {
     PrintBeacon();
 }
 
-void Meteor::MoveMeteors() {
+void MeteorState::MoveMeteors() {
     for (int i = 0; i < meteorCount; i++) {
         if (meteorDir[i] == -1) {
             meteorPos[i] -= meteorSpeed[i];
@@ -56,8 +58,8 @@ void Meteor::MoveMeteors() {
                         Respawn(i);
                     } else {
                         meteorLife[i] += meteorLife[x];
-                        if (meteorLife[i] > Meteor::MAX_SPEED) {
-                            meteorLife[i] = Meteor::MAX_SPEED;
+                        if (meteorLife[i] > MeteorState::MAX_SPEED) {
+                            meteorLife[i] = MeteorState::MAX_SPEED;
                         }
                         meteorSpeed[i] = meteorLife[i] * 10;
                         meteorLife[x] = 0;
@@ -87,9 +89,9 @@ void Meteor::MoveMeteors() {
     }
 }
 
-void Meteor::CheckReadEnd() {
+void MeteorState::CheckReadEnd() {
     for (int x = 0; x < meteorCount; x++) {
-        if (meteorPos[x] / 100 > strip->PixelCount() - 2 ||
+        if (meteorPos[x] / 100 > strip.PixelCount() - 2 ||
             meteorPos[x] / 100 < 2) {
             if (meteorDir[x] == -1) {
                 meteorDir[x] = 1;
@@ -100,7 +102,7 @@ void Meteor::CheckReadEnd() {
     }
 }
 
-void Meteor::CheckBeacon() {
+void MeteorState::CheckBeacon() {
     if (beacon != -1) {
         if (beaconSaveSpawn < 0) {
             for (int i = 0; i < meteorCount; i++) {
@@ -117,43 +119,43 @@ void Meteor::CheckBeacon() {
     }
 }
 
-void Meteor::PaintHead() {
+void MeteorState::PaintHead() {
     for (int i = 0; i < meteorCount; i++) {
         int pos = meteorPos[i] / 100;
         RgbColor color = meteorColor[i];
-        strip->SetColor(pos, color);
+        strip.SetColor(pos, color);
         if (meteorDir[i] == -1) {
-            if (pos + 1 < strip->PixelCount())
-                strip->SetColor(pos + 1, color);
-            if (pos + 2 < strip->PixelCount() && meteorSpeed[i] > 20)
-                strip->SetColor(pos + 2, color);
+            if (pos + 1 < strip.PixelCount())
+                strip.SetColor(pos + 1, color);
+            if (pos + 2 < strip.PixelCount() && meteorSpeed[i] > 20)
+                strip.SetColor(pos + 2, color);
         } else {
             if (pos - 1 > 0)
-                strip->SetColor(pos - 1, color);
+                strip.SetColor(pos - 1, color);
             if (pos - 2 > 0 && meteorSpeed[i] > 20)
-                strip->SetColor(pos - 2, color);
+                strip.SetColor(pos - 2, color);
         }
     }
 }
 
-void Meteor::FadeMeteors() {
-    for (int i = 0; i < strip->PixelCount(); i++) {
-        RgbColor c = strip->GetColor(i);
+void MeteorState::FadeMeteors() {
+    for (int i = 0; i < strip.PixelCount(); i++) {
+        RgbColor c = strip.GetColor(i);
         if (c.R != 10 && c.G != 10 && c.B != 10) {
             c.Darken(5);
-            strip->SetColor(i, c);
+            strip.SetColor(i, c);
         } else {
-            strip->SetColor(i, backgroundColor);
+            strip.SetColor(i, backgroundColor);
         }
     }
 }
 
-void Meteor::Respawn(int meteorNumber) {
+void MeteorState::Respawn(int meteorNumber) {
     if (meteorLife[meteorNumber] == 0) {
         meteorLife[meteorNumber] = 10;
 
         if (RandomInt(0, 2) == 0) {
-            meteorPos[meteorNumber] = strip->PixelCount() * 100 - 500;
+            meteorPos[meteorNumber] = strip.PixelCount() * 100 - 500;
         } else {
             meteorPos[meteorNumber] = 500;
         }
@@ -170,14 +172,14 @@ void Meteor::Respawn(int meteorNumber) {
     }
 }
 
-void Meteor::Initialize() {
+void MeteorState::Initialize() {
     timeDif = 0;
     beaconTime = 0;
     beacon = -1;
     backgroundColor = RgbColor(10, 10, 10);
     /* Initializes the meteor attributes */
     for (int i = 0; i < meteorCount; i++) {
-        meteorPos[i] = RandomInt(0, strip->PixelCount() * 100);
+        meteorPos[i] = RandomInt(0, strip.PixelCount() * 100);
     }
 
     for (int i = 0; i < meteorCount; i++) {
@@ -210,41 +212,41 @@ void Meteor::Initialize() {
     }
 }
 
-void Meteor::PrintVoid() {
-    for (int i = 0; i < strip->PixelCount(); i++) {
-        RgbColor c = strip->GetColor(i);
+void MeteorState::PrintVoid() {
+    for (int i = 0; i < strip.PixelCount(); i++) {
+        RgbColor c = strip.GetColor(i);
         if (c.R == 0 && c.G == 0 && c.B == 0) {
-            strip->SetColor(i, backgroundColor);
+            strip.SetColor(i, backgroundColor);
         }
     }
 }
 
-void Meteor::PrintBeacon() {
+void MeteorState::PrintBeacon() {
     if (millis() - beaconTime > beaconSpawnTime) {
         beaconTime = millis();
-        beacon = RandomInt(10, strip->PixelCount() - 10);
+        beacon = RandomInt(10, strip.PixelCount() - 10);
         beaconSaveSpawn = 600;
     }
 
     if (beacon != -1) {
         if (beaconSaveSpawn < 0) {
             for (int i = beacon - 5; i < beacon + 5; i++) {
-                strip->SetColor(i, colorByID(beaconColor));
+                strip.SetColor(i, colorByID(beaconColor));
             }
         } else {
             for (int i = beacon - 5; i < beacon + 5; i++) {
-                strip->SetColor(i, colorByID(beaconColor));
+                strip.SetColor(i, colorByID(beaconColor));
             }
-            strip->SetColor(beacon - 6, RgbColor(255, 255, 255));
-            strip->SetColor(beacon - 7, RgbColor(255, 255, 255));
-            strip->SetColor(beacon + 5, RgbColor(255, 255, 255));
-            strip->SetColor(beacon + 6, RgbColor(255, 255, 255));
+            strip.SetColor(beacon - 6, RgbColor(255, 255, 255));
+            strip.SetColor(beacon - 7, RgbColor(255, 255, 255));
+            strip.SetColor(beacon + 5, RgbColor(255, 255, 255));
+            strip.SetColor(beacon + 6, RgbColor(255, 255, 255));
         }
         beaconColor += 4;
     }
 }
 
-RgbColor Meteor::colorByID(byte colorNumber) {
+RgbColor MeteorState::colorByID(byte colorNumber) {
     colorNumber = 255 - colorNumber;
     if (colorNumber < 85) {
         return RgbColor(255 - colorNumber * 3, 0, colorNumber * 3);

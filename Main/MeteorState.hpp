@@ -1,12 +1,13 @@
 #pragma once
 
 #include "LedStrip.hpp"
+#include "State.hpp"
 
-class Meteor {
+class MeteorState : public State {
   public:
     static const int MAX_SPEED = 30;
-    Meteor(LedStrip *strip);
-    void Update();
+    MeteorState(LedStrip &led_strip);
+    void Update() override;
 
   private:
     void Initialize();
@@ -34,7 +35,7 @@ class Meteor {
     int meteorLife[meteorCount];       // The life points of the meteor
     long timeDif;
     long beaconTime;
-    LedStrip *const strip;
+    LedStrip &strip;
     int beacon;
     int beaconSaveSpawn;
     byte beaconColor;
