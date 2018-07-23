@@ -164,7 +164,12 @@ void Meteor:: Respawn(int meteorNumber) {
       meteorPos[meteorNumber] = 500;
     }
 
-    meteorColor[meteorNumber] = RgbColor(HslColor(RandomInt(0, 101) / 100.0, 1, RandomInt(0, 51) / 100.0));
+    if (RandomInt(0, 2) == 0) {
+      meteorColor[meteorNumber] = RgbColor(HsbColor(RandomInt(0, 101) / 100.0, 1, RandomInt(10, 51) / 100.0));
+    } else {
+      meteorColor[meteorNumber] = RgbColor(RandomInt(30, 255), RandomInt(30, 255), RandomInt(30, 255));
+    }
+
     meteorSpeed[meteorNumber] = meteorLife[meteorNumber] * 10;
 
   }
@@ -200,7 +205,11 @@ void Meteor:: Initialize() {
   }
 
   for (int i = 0; i < meteorCount; i++) {
-    meteorColor[i] = RgbColor(HslColor(RandomInt(0, 101) / 100.0, 1, RandomInt(10, 51) / 100.0));
+    if (RandomInt(0, 2) == 0) {
+      meteorColor[i] = RgbColor(HsbColor(RandomInt(0, 101) / 100.0, 1, RandomInt(10, 51) / 100.0));
+    } else {
+      meteorColor[i] = RgbColor(RandomInt(30, 255), RandomInt(30, 255), RandomInt(30, 255));
+    }
   }
 
 }
