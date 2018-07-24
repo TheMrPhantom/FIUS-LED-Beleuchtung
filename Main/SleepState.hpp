@@ -4,6 +4,6 @@
 
 class SleepState : public State {
   public:
-    SleepState(LedStrip &) {}
-    void Update() override {}
+    SleepState(LedStrip &);
+    void Update() override;
 };
