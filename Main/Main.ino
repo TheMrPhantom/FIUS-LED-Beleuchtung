@@ -19,7 +19,7 @@ std::array<std::unique_ptr<StateFactory>, 5> state_factories{
 std::unique_ptr<LedStrip> led_strip;
 std::unique_ptr<WifiGateway> wifi_gateway;
 std::unique_ptr<State> current_state;
-int32_t current_state_index = 2; // Meteor
+int32_t current_state_index = 3; // Meteor
 
 void InitState() {
     current_state = state_factories[current_state_index]->create(*led_strip);
