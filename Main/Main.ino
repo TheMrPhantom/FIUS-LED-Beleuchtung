@@ -21,7 +21,6 @@ int32_t current_state_index = 2; // Meteor
 std::unique_ptr<LedStrip> led_strip;
 std::unique_ptr<WifiGateway> wifi_gateway;
 std::unique_ptr<State> current_state;
-int64_t last_millis;
 
 void InitState() {
     current_state = kStateFactories[current_state_index]->create(*led_strip);
@@ -38,7 +37,6 @@ void setup() {
     led_strip = make_unique<LedStrip>(kPixelCount, kPin);
     wifi_gateway = make_unique<WifiGateway>(IncrementState);
     InitState();
-    last_millis = millis();
 }
 
 void loop() {
