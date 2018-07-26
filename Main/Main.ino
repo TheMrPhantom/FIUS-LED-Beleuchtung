@@ -10,13 +10,14 @@
 #include <vector>
 
 const int32_t kPixelCount = 850;
-const uint8_t kPin = 4;
-const std::array<std::unique_ptr<StateFactory>, 5> kStateFactories{
-    MakeStateFactory<WhiteState>(), MakeStateFactory<RotatedRainbowState>(),
-    MakeStateFactory<BubbleSortState>(), MakeStateFactory<MeteorState>(),
+const std::array<std::unique_ptr<StateFactory>, 6> kStateFactories{
+    MakeStateFactory<WhiteState>(),
+    MakeStateFactory<RotatedRainbowState>(),
+    MakeStateFactory<BubbleSortState>(),
+    MakeStateFactory<MeteorState>(),
     MakeStateFactory<SleepState>()};
 
-int32_t current_state_index = 2; // Meteor
+int32_t current_state_index = 3; // Meteor
 
 std::unique_ptr<LedStrip> led_strip;
 std::unique_ptr<WifiGateway> wifi_gateway;
@@ -34,7 +35,7 @@ void IncrementState() {
 
 void setup() {
     Serial.begin(115200);
-    led_strip = make_unique<LedStrip>(kPixelCount, kPin);
+    led_strip = make_unique<LedStrip>(kPixelCount);
     wifi_gateway = make_unique<WifiGateway>(IncrementState);
     InitState();
 }
@@ -42,9 +43,9 @@ void setup() {
 void loop() {
     static FrameTimer timer{33};
     wifi_gateway->Update();
-    if (timer.NextFrame()) {
+    while (timer.NextFrame()) {
         timer.Debug();
         current_state->Update();
-        led_strip->Update();
     }
+    led_strip->Update();
 }

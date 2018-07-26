@@ -9,7 +9,7 @@ class BubbleSortState : public State {
 
   private:
     void Display();
-    RgbColor IdToColor(int32_t id);
+    CRGB IdToColor(int32_t id);
 
     static const int32_t kGroupSize = 8;
 

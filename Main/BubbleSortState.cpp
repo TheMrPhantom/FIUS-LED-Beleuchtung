@@ -33,12 +33,12 @@ void BubbleSortState::Display() {
     }
 }
 
-RgbColor BubbleSortState::IdToColor(int32_t id) {
+CRGB BubbleSortState::IdToColor(int32_t id) {
     if (id < 255) {
-        return RgbColor{static_cast<uint8_t>(255 - id),
+        return CRGB{static_cast<uint8_t>(255 - id),
                         static_cast<uint8_t>(id), 0};
     }
     id -= 255;
-    return RgbColor{0, static_cast<uint8_t>(255 - id),
+    return CRGB{0, static_cast<uint8_t>(255 - id),
                     static_cast<uint8_t>(id)};
 }

@@ -122,7 +122,7 @@ void MeteorState::CheckBeacon() {
 void MeteorState::PaintHead() {
     for (int i = 0; i < meteorCount; i++) {
         int pos = meteorPos[i] / 100;
-        RgbColor color = meteorColor[i];
+        CRGB color = meteorColor[i];
         strip.SetColor(pos, color);
         if (meteorDir[i] == -1) {
             if (pos + 1 < strip.PixelCount())
@@ -140,9 +140,9 @@ void MeteorState::PaintHead() {
 
 void MeteorState::FadeMeteors() {
     for (int i = 0; i < strip.PixelCount(); i++) {
-        RgbColor c = strip.GetColor(i);
-        if (c.R != 10 && c.G != 10 && c.B != 10) {
-            c.Darken(5);
+        CRGB c = strip.GetColor(i);
+        if (c.r != 10 && c.g != 10 && c.b != 10) {
+            c.subtractFromRGB(5);
             strip.SetColor(i, c);
         } else {
             strip.SetColor(i, backgroundColor);
@@ -161,10 +161,10 @@ void MeteorState::Respawn(int meteorNumber) {
         }
 
         if (RandomInt(0, 2) == 0) {
-            meteorColor[meteorNumber] = RgbColor(HsbColor(
-                RandomInt(0, 101) / 100.0, 1, RandomInt(10, 51) / 100.0));
+            meteorColor[meteorNumber] =
+                CHSV(RandomInt(0, 255), 1, RandomInt(25, 130));
         } else {
-            meteorColor[meteorNumber] = RgbColor(
+            meteorColor[meteorNumber] = CRGB(
                 RandomInt(30, 255), RandomInt(30, 255), RandomInt(30, 255));
         }
 
@@ -176,7 +176,7 @@ void MeteorState::Initialize() {
     timeDif = 0;
     beaconTime = 0;
     beacon = -1;
-    backgroundColor = RgbColor(10, 10, 10);
+    backgroundColor = CRGB(10, 10, 10);
     /* Initializes the meteor attributes */
     for (int i = 0; i < meteorCount; i++) {
         meteorPos[i] = RandomInt(0, strip.PixelCount() * 100);
@@ -203,19 +203,18 @@ void MeteorState::Initialize() {
 
     for (int i = 0; i < meteorCount; i++) {
         if (RandomInt(0, 2) == 0) {
-            meteorColor[i] = RgbColor(HsbColor(RandomInt(0, 101) / 100.0, 1,
-                                               RandomInt(10, 51) / 100.0));
+            meteorColor[i] = CHSV(RandomInt(0, 255), 1, RandomInt(26, 130));
         } else {
-            meteorColor[i] = RgbColor(RandomInt(30, 255), RandomInt(30, 255),
-                                      RandomInt(30, 255));
+            meteorColor[i] = CRGB(RandomInt(30, 255), RandomInt(30, 255),
+                                  RandomInt(30, 255));
         }
     }
 }
 
 void MeteorState::PrintVoid() {
     for (int i = 0; i < strip.PixelCount(); i++) {
-        RgbColor c = strip.GetColor(i);
-        if (c.R == 0 && c.G == 0 && c.B == 0) {
+        CRGB c = strip.GetColor(i);
+        if (c.r == 0 && c.g == 0 && c.b == 0) {
             strip.SetColor(i, backgroundColor);
         }
     }
@@ -237,24 +236,24 @@ void MeteorState::PrintBeacon() {
             for (int i = beacon - 5; i < beacon + 5; i++) {
                 strip.SetColor(i, colorByID(beaconColor));
             }
-            strip.SetColor(beacon - 6, RgbColor(255, 255, 255));
-            strip.SetColor(beacon - 7, RgbColor(255, 255, 255));
-            strip.SetColor(beacon + 5, RgbColor(255, 255, 255));
-            strip.SetColor(beacon + 6, RgbColor(255, 255, 255));
+            strip.SetColor(beacon - 6, CRGB::White);
+            strip.SetColor(beacon - 7, CRGB::White);
+            strip.SetColor(beacon + 5, CRGB::White);
+            strip.SetColor(beacon + 6, CRGB::White);
         }
         beaconColor += 4;
     }
 }
 
-RgbColor MeteorState::colorByID(byte colorNumber) {
+CRGB MeteorState::colorByID(byte colorNumber) {
     colorNumber = 255 - colorNumber;
     if (colorNumber < 85) {
-        return RgbColor(255 - colorNumber * 3, 0, colorNumber * 3);
+        return CRGB(255 - colorNumber * 3, 0, colorNumber * 3);
     }
     if (colorNumber < 170) {
         colorNumber -= 85;
-        return RgbColor(0, colorNumber * 3, 255 - colorNumber * 3);
+        return CRGB(0, colorNumber * 3, 255 - colorNumber * 3);
     }
     colorNumber -= 170;
-    return RgbColor(colorNumber * 3, 255 - colorNumber * 3, 0);
+    return CRGB(colorNumber * 3, 255 - colorNumber * 3, 0);
 }
