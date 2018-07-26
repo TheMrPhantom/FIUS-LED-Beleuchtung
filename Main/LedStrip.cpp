@@ -23,8 +23,9 @@ void LedUpdater::Update() {
 
 void LedUpdater::Show(void *) {
     while (true) {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        FastLED.show();
+        if (ulTaskNotifyTake(pdTRUE, portMAX_DELAY)) {
+            FastLED.show();
+        }
     }
 }
 
@@ -39,6 +40,7 @@ LedUpdater::LedUpdater() {
 }
 
 LedStrip::LedStrip(int32_t pixelCount) : pixels_(pixelCount) {
+    SetColors(0, PixelCount() - 1, CRGB::Black);
     FastLED.addLeds<WS2812B, kPin, GRB>(pixels_.data(), pixels_.size());
     Update();
 }
