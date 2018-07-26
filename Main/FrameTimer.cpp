@@ -2,6 +2,8 @@
 
 #include <HardwareSerial.h>
 
+static const int64_t kCatchTime = 250;
+
 FrameTimer::FrameTimer(int32_t frame_time) : target_frame_time_{frame_time} {}
 
 bool FrameTimer::NextFrame() {
@@ -12,8 +14,8 @@ bool FrameTimer::NextFrame() {
     }
     int64_t m = millis();
     if (m >= target_frame_end_) {
-        if (m - 100 > target_frame_end_) {
-            target_frame_end_ = m - 100;
+        if (m - kCatchTime > target_frame_end_) {
+            target_frame_end_ = m - kCatchTime;
         }
         ++frame_count_;
         last_frame_time_ = m - last_frame_end_;
