@@ -123,17 +123,17 @@ void MeteorState::PaintHead() {
     for (int i = 0; i < meteorCount; i++) {
         int pos = meteorPos[i] / 100;
         CRGB color = meteorColor[i];
-        strip.SetColor(pos, color);
+        strip.SetColor(color, pos);
         if (meteorDir[i] == -1) {
             if (pos + 1 < strip.PixelCount())
-                strip.SetColor(pos + 1, color);
+                strip.SetColor(color, pos + 1);
             if (pos + 2 < strip.PixelCount() && meteorSpeed[i] > 20)
-                strip.SetColor(pos + 2, color);
+                strip.SetColor(color, pos + 2);
         } else {
             if (pos - 1 > 0)
-                strip.SetColor(pos - 1, color);
+                strip.SetColor(color, pos - 1);
             if (pos - 2 > 0 && meteorSpeed[i] > 20)
-                strip.SetColor(pos - 2, color);
+                strip.SetColor(color, pos - 2);
         }
     }
 }
@@ -143,9 +143,9 @@ void MeteorState::FadeMeteors() {
         CRGB c = strip.GetColor(i);
         if (c.r != 10 && c.g != 10 && c.b != 10) {
             c.subtractFromRGB(5);
-            strip.SetColor(i, c);
+            strip.SetColor(c, i);
         } else {
-            strip.SetColor(i, backgroundColor);
+            strip.SetColor(backgroundColor, i);
         }
     }
 }
@@ -215,7 +215,7 @@ void MeteorState::PrintVoid() {
     for (int i = 0; i < strip.PixelCount(); i++) {
         CRGB c = strip.GetColor(i);
         if (c.r == 0 && c.g == 0 && c.b == 0) {
-            strip.SetColor(i, backgroundColor);
+            strip.SetColor(backgroundColor, i);
         }
     }
 }
@@ -230,16 +230,16 @@ void MeteorState::PrintBeacon() {
     if (beacon != -1) {
         if (beaconSaveSpawn < 0) {
             for (int i = beacon - 5; i < beacon + 5; i++) {
-                strip.SetColor(i, colorByID(beaconColor));
+                strip.SetColor(colorByID(beaconColor), i);
             }
         } else {
             for (int i = beacon - 5; i < beacon + 5; i++) {
-                strip.SetColor(i, colorByID(beaconColor));
+                strip.SetColor(colorByID(beaconColor), i);
             }
-            strip.SetColor(beacon - 6, CRGB::White);
-            strip.SetColor(beacon - 7, CRGB::White);
-            strip.SetColor(beacon + 5, CRGB::White);
-            strip.SetColor(beacon + 6, CRGB::White);
+            strip.SetColor(CRGB::White, beacon - 6);
+            strip.SetColor(CRGB::White, beacon - 7);
+            strip.SetColor(CRGB::White, beacon + 5);
+            strip.SetColor(CRGB::White, beacon + 6);
         }
         beaconColor += 4;
     }

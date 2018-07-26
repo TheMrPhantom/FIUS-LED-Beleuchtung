@@ -40,74 +40,80 @@ LedUpdater::LedUpdater() {
 }
 
 LedStrip::LedStrip(int32_t pixelCount) : pixels_(pixelCount) {
-    SetColors(0, PixelCount() - 1, CRGB::Black);
+    SetColors(CRGB::Black);
     FastLED.addLeds<WS2812B, kPin, GRB>(pixels_.data(), pixels_.size());
     Update();
 }
 
-void LedStrip::SetColor(int32_t pixel, CRGB color) {
+int32_t LedStrip::PixelCount() { return static_cast<int32_t>(pixels_.size()); }
+
+CRGB LedStrip::GetColor(int32_t pixel) const { return pixels_[pixel]; }
+
+void LedStrip::SetColor(CRGB color, int32_t pixel) {
     if (GetColor(pixel) != color) {
         pixels_[pixel] = color;
         stateChanged_ = true;
     }
 }
 
-int32_t LedStrip::PixelCount() { return static_cast<int32_t>(pixels_.size()); }
+void LedStrip::SetColors(CRGB color, int32_t first_pixel) {
+    SetColors(color, first_pixel, PixelCount() - first_pixel);
+}
 
-CRGB LedStrip::GetColor(int32_t pixel) { return pixels_[pixel]; }
-
-void LedStrip::SetColors(CRGB color) { SetColors(0, PixelCount() - 1, color); }
-
-void LedStrip::SetColors(int32_t first_pixel, int32_t last_pixel, CRGB color) {
-    for (int32_t pixel = first_pixel; pixel <= last_pixel; ++pixel) {
-        SetColor(pixel, color);
+void LedStrip::SetColors(CRGB color, int32_t first_pixel, int32_t count) {
+    for (int32_t pixel = first_pixel; pixel < first_pixel + count; ++pixel) {
+        SetColor(color, pixel);
     }
 }
 
-void LedStrip::Gradient(CRGB first_color, CRGB last_color) {
-    Gradient(0, PixelCount() - 1, first_color, last_color);
+void LedStrip::Gradient(CRGB first_color, CRGB last_color,
+                        int32_t first_pixel) {
+    Gradient(first_color, last_color, first_pixel, PixelCount() - first_pixel);
 }
 
-void LedStrip::Gradient(int32_t first_pixel, int32_t last_pixel,
-                        CRGB first_color, CRGB last_color) {
-    int32_t diff = last_pixel - first_pixel;
+void LedStrip::Gradient(CRGB first_color, CRGB last_color, int32_t first_pixel,
+                        int32_t count) {
+    int32_t diff = count - 1;
     int32_t i = diff;
     int32_t j = 0;
-    for (int32_t pixel = first_pixel; pixel <= last_pixel; ++pixel) {
+    for (int32_t pixel = first_pixel; pixel < first_pixel + count; ++pixel) {
         CRGB color{static_cast<uint8_t>(first_color.red * i / diff +
                                         last_color.red * j / diff),
                    static_cast<uint8_t>(first_color.green * i / diff +
                                         last_color.green * j / diff),
                    static_cast<uint8_t>(first_color.blue * i / diff +
                                         last_color.blue * j / diff)};
-        SetColor(pixel, color);
+        SetColor(color, pixel);
         --i;
         ++j;
     }
 }
 
-void LedStrip::Mirror() { Mirror(0, PixelCount() - 1); }
+void LedStrip::Mirror(int32_t first_pixel) {
+    Mirror(first_pixel, PixelCount() - first_pixel);
+}
 
-void LedStrip::Mirror(int32_t first_pixel, int32_t last_pixel) {
+void LedStrip::Mirror(int32_t first_pixel, int32_t count) {
     int32_t i = 0;
-    int32_t j = last_pixel - first_pixel;
-    int32_t changes = (j + 1) / 2;
-    while (i < changes) {
+    int32_t j = count - 1;
+    while (i < j) {
         int32_t left_pixel = first_pixel + i;
-        int32_t right_pixel = last_pixel - j;
+        int32_t right_pixel = first_pixel + j;
         CRGB left_color = GetColor(left_pixel);
         CRGB right_color = GetColor(right_pixel);
-        SetColor(left_pixel, right_color);
-        SetColor(right_pixel, left_color);
+        SetColor(right_color, left_pixel);
+        SetColor(left_color, right_pixel);
         ++i;
         --j;
     }
 }
 
-void LedStrip::Rotate(int32_t offset) { Rotate(0, PixelCount() - 1, offset); }
+void LedStrip::Rotate(int32_t offset, int32_t first_pixel) {
+    Rotate(offset, first_pixel, PixelCount() - first_pixel);
+}
 
-void LedStrip::Rotate(int32_t first_pixel, int32_t last_pixel, int32_t offset) {
-    int32_t count = last_pixel - first_pixel + 1;
+void LedStrip::Rotate(int32_t offset, int32_t first_pixel, int32_t count) {
+    int32_t last_pixel = first_pixel + count - 1;
     while (offset < 0) {
         offset += count;
     }
@@ -126,10 +132,10 @@ void LedStrip::Rotate(int32_t first_pixel, int32_t last_pixel, int32_t offset) {
             if (src == start) {
                 break;
             }
-            SetColor(dst, GetColor(src));
+            SetColor(GetColor(src), dst);
             dst = src;
         }
-        SetColor(dst, temp);
+        SetColor(temp, dst);
     }
 }
 

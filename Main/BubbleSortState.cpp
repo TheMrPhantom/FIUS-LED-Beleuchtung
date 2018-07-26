@@ -23,22 +23,20 @@ void BubbleSortState::Update() {
 }
 
 void BubbleSortState::Display() {
-    int32_t right_pixel = 0;
+    int32_t next_pixel = 0;
     for (int32_t group = 0; group < ids_.size(); ++group) {
-        int32_t left_pixel = right_pixel;
-        right_pixel = led_strip_.PixelCount() * (group + 1) /
-                      static_cast<int32_t>(ids_.size());
-        led_strip_.SetColors(left_pixel, right_pixel - 1,
-                             IdToColor(ids_[group]));
+        int32_t pixel = next_pixel;
+        next_pixel = led_strip_.PixelCount() * (group + 1) /
+                     static_cast<int32_t>(ids_.size());
+        led_strip_.SetColors(IdToColor(ids_[group]), pixel, next_pixel - pixel);
     }
 }
 
 CRGB BubbleSortState::IdToColor(int32_t id) {
     if (id < 255) {
-        return CRGB{static_cast<uint8_t>(255 - id),
-                        static_cast<uint8_t>(id), 0};
+        return CRGB{static_cast<uint8_t>(255 - id), static_cast<uint8_t>(id),
+                    0};
     }
     id -= 255;
-    return CRGB{0, static_cast<uint8_t>(255 - id),
-                    static_cast<uint8_t>(id)};
+    return CRGB{0, static_cast<uint8_t>(255 - id), static_cast<uint8_t>(id)};
 }
