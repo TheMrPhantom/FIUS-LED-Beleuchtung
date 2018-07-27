@@ -1,8 +1,8 @@
-#include "BubbleSortState.hpp"
 #include "FrameTimer.hpp"
 #include "MeteorState.hpp"
 #include "RotatedRainbowState.hpp"
 #include "SleepState.hpp"
+#include "SortState.hpp"
 #include "Util.hpp"
 #include "WhiteState.hpp"
 #include "WifiGateway.hpp"
@@ -10,20 +10,21 @@
 #include <vector>
 
 const int32_t kPixelCount = 850;
-const std::array<std::unique_ptr<StateFactory>, 5> kStateFactories{
-    MakeStateFactory<WhiteState>(), MakeStateFactory<RotatedRainbowState>(),
-    MakeStateFactory<BubbleSortState>(), MakeStateFactory<MeteorState>(),
-    MakeStateFactory<SleepState>()};
-
-int32_t current_state_index = 3; // Meteor
 
 std::unique_ptr<LedStrip> led_strip;
 std::unique_ptr<WifiGateway> wifi_gateway;
 std::unique_ptr<State> current_state;
 
-void InitState() {
-    current_state = kStateFactories[current_state_index]->create(*led_strip);
-}
+std::vector<std::function<std::unique_ptr<State>()>> kStateFactories{
+    [&]() { return make_unique<WhiteState>(*led_strip); },
+    [&]() { return make_unique<RotatedRainbowState>(*led_strip); },
+    [&]() { return make_unique<BubbleSortState>(*led_strip, 8); },
+    [&]() { return make_unique<MergeSortState>(*led_strip, 1); },
+    [&]() { return make_unique<MeteorState>(*led_strip); },
+    [&]() { return make_unique<SleepState>(*led_strip); }};
+int32_t current_state_index = 3; // Merge Sort
+
+void InitState() { current_state = kStateFactories[current_state_index](); }
 
 void IncrementState() {
     ++current_state_index;
