@@ -9,7 +9,9 @@ void Display(LedStrip &led_strip, const std::vector<int32_t> &ids) {
                      static_cast<int32_t>(ids.size());
         auto id = ids[group];
         CRGB color;
-        if (id < 255) {
+        if (id < 0) {
+            color = CRGB::Black;
+        } else if (id < 255) {
             color = CRGB{static_cast<uint8_t>(255 - id),
                          static_cast<uint8_t>(id), 0};
         } else {
@@ -23,7 +25,7 @@ void Display(LedStrip &led_strip, const std::vector<int32_t> &ids) {
 } // namespace
 
 SortStateBase::SortStateBase(LedStrip &led_strip, int32_t group_size)
-    : ids_(led_strip.PixelCount() / group_size_), led_strip_{led_strip},
+    : ids_(led_strip.PixelCount() / group_size), led_strip_{led_strip},
       group_size_{group_size} {
     for (auto &id : ids_) {
         id = RandomInt(0, 510);
@@ -49,23 +51,39 @@ void BubbleSortState::SortStep() {
 }
 
 void MergeSortState::SortStep() {
-    if (position_ & 1) {
-        return;
-    }
-    auto begin = ids_.begin();
-    auto end = ids_.end();
-    int32_t bit = 1;
-    while (end - begin > (2 << anti_depth_)) {
-        bit <<= 1;
-        if (position_ & bit) {
-            begin += (end - begin) / 2;
-        } else {
-            end = begin + (end - begin) / 2;
+    auto right_end = merge_.end();
+    auto left_end = merge_.begin() + merge_.size() / 2;
+    if (left_ == left_end && right_ == right_end) {
+        if (position_ & 1) {
+            return;
+        }
+        auto begin = ids_.begin();
+        auto end = ids_.end();
+        int32_t bit = 1;
+        while (end - begin > (2 << anti_depth_)) {
+            bit <<= 1;
+            if (position_ & bit) {
+                begin += (end - begin) / 2;
+            } else {
+                end = begin + (end - begin) / 2;
+            }
+        }
+        merge_.assign(begin, end);
+        left_ = merge_.begin();
+        right_end = merge_.end();
+        left_end = right_ = merge_.begin() + merge_.size() / 2;
+        dst_ = begin;
+        std::fill(begin, end, -1);
+        ++anti_depth_;
+        if ((position_ ^= bit) & bit) {
+            anti_depth_ = 0;
         }
     }
-    ++anti_depth_;
-    if ((position_ ^= bit) & bit) {
-        anti_depth_ = 0;
+    if (left_ == left_end) {
+        *(dst_++) = *(right_++);
+    } else if (right_ == right_end || *right_ > *left_) {
+        *(dst_++) = *(left_++);
+    } else {
+        *(dst_++) = *(right_++);
     }
-    std::inplace_merge(begin, begin + (end - begin) / 2, end);
 }

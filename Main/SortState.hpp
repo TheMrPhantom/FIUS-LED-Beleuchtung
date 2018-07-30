@@ -16,7 +16,7 @@ class SortStateBase : public State {
 
   private:
     LedStrip &led_strip_;
-    const int32_t group_size_ = 8;
+    const int32_t group_size_;
 };
 
 class BubbleSortState : public SortStateBase {
@@ -41,4 +41,8 @@ class MergeSortState : public SortStateBase {
   private:
     int32_t position_ = 0;
     int32_t anti_depth_ = 0;
+    std::vector<int32_t> merge_;
+    std::vector<int32_t>::iterator left_ = merge_.begin();
+    std::vector<int32_t>::iterator right_ = merge_.begin();
+    std::vector<int32_t>::iterator dst_;
 };
