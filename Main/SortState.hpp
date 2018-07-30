@@ -13,6 +13,7 @@ class LedStrip;
 class SortStateBase : public State {
   public:
     SortStateBase(LedStrip &led_strip, int32_t group_size);
+    ~SortStateBase() noexcept;
     void Update() override;
 
   protected:
@@ -24,7 +25,8 @@ class SortStateBase : public State {
   private:
     LedStrip &led_strip_;
     const int32_t group_size_;
-    TaskHandle_t next_task_;
+    TaskHandle_t my_task_;
+    TaskHandle_t co_task_;
 };
 
 class BubbleSortState : public SortStateBase {

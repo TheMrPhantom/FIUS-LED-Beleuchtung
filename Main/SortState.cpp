@@ -28,34 +28,39 @@ void Display(LedStrip &led_strip, const std::vector<int32_t> &ids) {
 
 SortStateBase::SortStateBase(LedStrip &led_strip, int32_t group_size)
     : ids_(led_strip.PixelCount() / group_size), led_strip_{led_strip},
-      group_size_{group_size} {
+      group_size_{group_size}, my_task_{xTaskGetCurrentTaskHandle()} {
     for (auto &id : ids_) {
         id = RandomInt(0, 510);
     }
     xTaskCreate(
-        [](void *inst) {
+        [](void *ptr) {
             ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-            static_cast<SortStateBase *>(inst)->Sort();
+            auto &base = *static_cast<SortStateBase *>(ptr);
+            base.Sort();
+            base.co_task_ = nullptr;
+            xTaskNotifyGive(base.my_task_);
+            vTaskDelete(nullptr);
         },
-        "", 2048, this, 2, &next_task_);
+        "", 2048, this, 2, &co_task_);
 }
 
 void SortStateBase::Update() {
-    printf("Debug2\n");
-    auto sort_task = next_task_;
-    next_task_ = xTaskGetCurrentTaskHandle();
-    xTaskNotifyGive(sort_task);
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    next_task_ = sort_task;
-    Display(led_strip_, ids_);
-    printf("Debug5\n");
+    if (co_task_) {
+        xTaskNotifyGive(co_task_);
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        Display(led_strip_, ids_);
+    }
+}
+
+SortStateBase::~SortStateBase() {
+    if (co_task_) {
+        vTaskDelete(co_task_);
+    }
 }
 
 void SortStateBase::FinishedStep() {
-    printf("Debug4\n");
-    xTaskNotifyGive(next_task_);
+    xTaskNotifyGive(my_task_);
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    printf("Debug3.1\n");
 }
 
 void BubbleSortState::Sort() {
@@ -73,7 +78,6 @@ void MergeSortState::Sort() { Sort(ids_.begin(), ids_.end()); }
 
 void MergeSortState::Sort(std::vector<int32_t>::iterator begin,
                           std::vector<int32_t>::iterator end) {
-    printf("Debug3.0\n");
     auto diff = end - begin;
     auto mid = begin + diff / 2;
     if (diff > 2) {
