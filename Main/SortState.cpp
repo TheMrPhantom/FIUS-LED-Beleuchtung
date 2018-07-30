@@ -82,7 +82,7 @@ void MergeSortState::Sort(std::vector<int32_t>::iterator begin,
     }
     std::vector<int32_t> merge(begin, end);
     std::for_each(begin, end, [](auto &c) {
-        CRGB color{c};
+        CRGB color{static_cast<uint32_t>(c)};
         color /= 8;
         c = (color.r << 16) | (color.g << 8) | color.b;
     });
@@ -108,4 +108,42 @@ void MergeSortState::Sort(std::vector<int32_t>::iterator begin,
         *(begin++) = (*left <= *right) ? *(left++) : *(right++);
         FinishedStep();
     }
+}
+
+void QuickSortState::Sort() { Sort(ids_.begin(), ids_.end()); }
+
+namespace {
+template <class Iter>
+Iter MedianIter(Iter a, Iter b, Iter c) noexcept(noexcept(*a)) {
+    auto min = [](Iter a, Iter b) noexcept(noexcept(*a))->Iter {
+        return *a < *b ? a : b;
+    };
+    auto max = [](Iter a, Iter b) noexcept(noexcept(*a))->Iter {
+        return *a > *b ? a : b;
+    };
+    return max(min(a, b), min(max(a, b), c));
+}
+} // namespace
+
+void QuickSortState::Sort(std::vector<int32_t>::iterator begin,
+                          std::vector<int32_t>::iterator end) {
+    auto c = end - begin;
+    if (c < 2) {
+        return;
+    }
+    auto pivot = end - 1;
+    std::swap(*MedianIter(begin + c / 4, begin + c / 2, begin + c * 3 / 4),
+              *pivot);
+    FinishedStep();
+    auto bound = begin;
+    for (auto iter = begin; iter < end - 1; ++iter) {
+        if (*iter < *pivot) {
+            std::swap(*iter, *(bound++));
+        }
+        FinishedStep();
+    }
+    std::swap(*bound, *pivot);
+    FinishedStep();
+    Sort(begin, bound);
+    Sort(bound + 1, end);
 }

@@ -48,3 +48,15 @@ class MergeSortState : public SortStateBase {
     void Sort(std::vector<int32_t>::iterator begin,
               std::vector<int32_t>::iterator end);
 };
+
+class QuickSortState : public SortStateBase {
+  public:
+    using SortStateBase::SortStateBase;
+
+  protected:
+    void Sort() override;
+
+  private:
+    void Sort(std::vector<int32_t>::iterator begin,
+              std::vector<int32_t>::iterator end);
+};
