@@ -2,6 +2,8 @@
 #include "LedStrip.hpp"
 #include "Util.hpp"
 
+#include <algorithm>
+
 namespace {
 void Display(LedStrip &led_strip, const std::vector<int32_t> &ids) {
     int32_t next_pixel = 0;
@@ -9,19 +11,7 @@ void Display(LedStrip &led_strip, const std::vector<int32_t> &ids) {
         int32_t pixel = next_pixel;
         next_pixel = led_strip.PixelCount() * (group + 1) /
                      static_cast<int32_t>(ids.size());
-        auto id = ids[group];
-        CRGB color;
-        if (id < 0) {
-            color = CRGB::Black;
-        } else if (id < 255) {
-            color = CRGB{static_cast<uint8_t>(255 - id),
-                         static_cast<uint8_t>(id), 0};
-        } else {
-            id -= 255;
-            color = CRGB{0, static_cast<uint8_t>(255 - id),
-                         static_cast<uint8_t>(id)};
-        }
-        led_strip.SetColors(color, pixel, next_pixel - pixel);
+        led_strip.SetColors(ids[group], pixel, next_pixel - pixel);
     }
 }
 } // namespace
@@ -29,8 +19,14 @@ void Display(LedStrip &led_strip, const std::vector<int32_t> &ids) {
 SortStateBase::SortStateBase(LedStrip &led_strip, int32_t group_size)
     : ids_(led_strip.PixelCount() / group_size), led_strip_{led_strip},
       group_size_{group_size}, my_task_{xTaskGetCurrentTaskHandle()} {
-    for (auto &id : ids_) {
-        id = RandomInt(0, 510);
+    for (auto &color : ids_) {
+        int32_t num = RandomInt(0, 510);
+        if (num < 255) {
+            color = ((255 - num) << 16) | (num << 8);
+        } else {
+            num -= 255;
+            color = ((255 - num) << 8) | num;
+        }
     }
     xTaskCreate(
         [](void *ptr) {
@@ -85,7 +81,11 @@ void MergeSortState::Sort(std::vector<int32_t>::iterator begin,
         Sort(mid, end);
     }
     std::vector<int32_t> merge(begin, end);
-    std::fill(begin, end, -1);
+    std::for_each(begin, end, [](auto &c) {
+        CRGB color{c};
+        color /= 8;
+        c = (color.r << 16) | (color.g << 8) | color.b;
+    });
     auto left = merge.begin();
     auto left_end = merge.begin() + diff / 2;
     auto right = left_end;
