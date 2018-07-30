@@ -9,34 +9,29 @@ class LedUpdater {
 
   private:
     static void Show(void *);
-
     LedUpdater();
-
     static LedUpdater kInstance;
-
-    TaskHandle_t waiting_task_ = 0;
+    TaskHandle_t co_task_;
 };
 
-void LedUpdater::Update() {
-    xTaskNotifyGive(LedUpdater::kInstance.waiting_task_);
-}
+void LedUpdater::Update() { xTaskNotifyGive(LedUpdater::kInstance.co_task_); }
 
 void LedUpdater::Show(void *) {
     while (true) {
-        if (ulTaskNotifyTake(pdTRUE, portMAX_DELAY)) {
-            FastLED.show();
-        }
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        FastLED.show();
+        delay(1);
     }
 }
 
 LedUpdater LedUpdater::kInstance{};
 
 LedUpdater::LedUpdater() {
-    xTaskCreate(Show, "Show",    // name
-                2048,            // stack depth
-                nullptr,         // passed parameter
-                2,               // priority
-                &waiting_task_); // task handle
+    xTaskCreate(Show, "Show", // name
+                2048,         // stack depth
+                nullptr,      // passed parameter
+                2,            // priority
+                &co_task_);   // task handle
 }
 
 LedStrip::LedStrip(int32_t pixelCount) : pixels_(pixelCount) {
