@@ -2,6 +2,8 @@
 
 #include "State.hpp"
 
+class LedStrip;
+
 class RotatedRainbowState : public State {
   public:
     RotatedRainbowState(LedStrip &led_strip);

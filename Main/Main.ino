@@ -1,4 +1,5 @@
 #include "FrameTimer.hpp"
+#include "LedStrip.hpp"
 #include "MeteorState.hpp"
 #include "RotatedRainbowState.hpp"
 #include "SleepState.hpp"

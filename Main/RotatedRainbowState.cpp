@@ -1,4 +1,5 @@
 #include "RotatedRainbowState.hpp"
+#include "LedStrip.hpp"
 
 RotatedRainbowState::RotatedRainbowState(LedStrip &led_strip)
     : led_strip_{led_strip} {

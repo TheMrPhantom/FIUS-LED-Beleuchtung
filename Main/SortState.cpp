@@ -1,4 +1,6 @@
 #include "SortState.hpp"
+#include "LedStrip.hpp"
+#include "Util.hpp"
 
 namespace {
 void Display(LedStrip &led_strip, const std::vector<int32_t> &ids) {
@@ -30,60 +32,76 @@ SortStateBase::SortStateBase(LedStrip &led_strip, int32_t group_size)
     for (auto &id : ids_) {
         id = RandomInt(0, 510);
     }
+    xTaskCreate(
+        [](void *inst) {
+            ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+            static_cast<SortStateBase *>(inst)->Sort();
+        },
+        "", 2048, this, 2, &next_task_);
 }
 
 void SortStateBase::Update() {
-    SortStep();
+    printf("Debug2\n");
+    auto sort_task = next_task_;
+    next_task_ = xTaskGetCurrentTaskHandle();
+    xTaskNotifyGive(sort_task);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    next_task_ = sort_task;
     Display(led_strip_, ids_);
+    printf("Debug5\n");
 }
 
-void BubbleSortState::SortStep() {
-    if (max_group_ > 0) {
-        if (ids_[current_group_] > ids_[current_group_ + 1]) {
-            std::swap(ids_[current_group_], ids_[current_group_ + 1]);
-        }
-        ++current_group_;
-        if (current_group_ == max_group_) {
-            current_group_ = 0;
-            --max_group_;
+void SortStateBase::FinishedStep() {
+    printf("Debug4\n");
+    xTaskNotifyGive(next_task_);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    printf("Debug3.1\n");
+}
+
+void BubbleSortState::Sort() {
+    for (int32_t end = ids_.size() - 1; end >= 1; --end) {
+        for (int32_t i = 0; i < end; ++i) {
+            if (ids_[i] > ids_[i + 1]) {
+                std::swap(ids_[i], ids_[i + 1]);
+            }
+            FinishedStep();
         }
     }
 }
 
-void MergeSortState::SortStep() {
-    auto right_end = merge_.end();
-    auto left_end = merge_.begin() + merge_.size() / 2;
-    if (left_ == left_end && right_ == right_end) {
-        if (position_ & 1) {
+void MergeSortState::Sort() { Sort(ids_.begin(), ids_.end()); }
+
+void MergeSortState::Sort(std::vector<int32_t>::iterator begin,
+                          std::vector<int32_t>::iterator end) {
+    printf("Debug3.0\n");
+    auto diff = end - begin;
+    auto mid = begin + diff / 2;
+    if (diff > 2) {
+        Sort(begin, mid);
+        Sort(mid, end);
+    }
+    std::vector<int32_t> merge(begin, end);
+    std::fill(begin, end, -1);
+    auto left = merge.begin();
+    auto left_end = merge.begin() + diff / 2;
+    auto right = left_end;
+    auto right_end = merge.end();
+    while (true) {
+        if (left == left_end) {
+            while (right != right_end) {
+                *(begin++) = *(right++);
+                FinishedStep();
+            }
             return;
         }
-        auto begin = ids_.begin();
-        auto end = ids_.end();
-        int32_t bit = 1;
-        while (end - begin > (2 << anti_depth_)) {
-            bit <<= 1;
-            if (position_ & bit) {
-                begin += (end - begin) / 2;
-            } else {
-                end = begin + (end - begin) / 2;
+        if (right == right_end) {
+            while (left != left_end) {
+                *(begin++) = *(left++);
+                FinishedStep();
             }
+            return;
         }
-        merge_.assign(begin, end);
-        left_ = merge_.begin();
-        right_end = merge_.end();
-        left_end = right_ = merge_.begin() + merge_.size() / 2;
-        dst_ = begin;
-        std::fill(begin, end, -1);
-        ++anti_depth_;
-        if ((position_ ^= bit) & bit) {
-            anti_depth_ = 0;
-        }
-    }
-    if (left_ == left_end) {
-        *(dst_++) = *(right_++);
-    } else if (right_ == right_end || *right_ > *left_) {
-        *(dst_++) = *(left_++);
-    } else {
-        *(dst_++) = *(right_++);
+        *(begin++) = (*left <= *right) ? *(left++) : *(right++);
+        FinishedStep();
     }
 }

@@ -2,7 +2,13 @@
 
 #include "State.hpp"
 
-#include <algorithm>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#include <cstdint>
+#include <vector>
+
+class LedStrip;
 
 class SortStateBase : public State {
   public:
@@ -10,13 +16,15 @@ class SortStateBase : public State {
     void Update() override;
 
   protected:
-    virtual void SortStep() = 0;
+    void FinishedStep();
+    virtual void Sort() = 0;
 
     std::vector<int32_t> ids_;
 
   private:
     LedStrip &led_strip_;
     const int32_t group_size_;
+    TaskHandle_t next_task_;
 };
 
 class BubbleSortState : public SortStateBase {
@@ -24,11 +32,7 @@ class BubbleSortState : public SortStateBase {
     using SortStateBase::SortStateBase;
 
   protected:
-    void SortStep() override;
-
-  private:
-    int32_t current_group_ = 0;
-    int32_t max_group_ = static_cast<int32_t>(ids_.size()) - 1;
+    void Sort() override;
 };
 
 class MergeSortState : public SortStateBase {
@@ -36,13 +40,9 @@ class MergeSortState : public SortStateBase {
     using SortStateBase::SortStateBase;
 
   protected:
-    void SortStep() override;
+    void Sort() override;
 
   private:
-    int32_t position_ = 0;
-    int32_t anti_depth_ = 0;
-    std::vector<int32_t> merge_;
-    std::vector<int32_t>::iterator left_ = merge_.begin();
-    std::vector<int32_t>::iterator right_ = merge_.begin();
-    std::vector<int32_t>::iterator dst_;
+    void Sort(std::vector<int32_t>::iterator begin,
+              std::vector<int32_t>::iterator end);
 };
