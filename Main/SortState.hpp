@@ -39,23 +39,29 @@ class SortState : public State {
     std::vector<int32_t> ids_;
     LedStrip &led_strip_;
     const int32_t group_size_;
-    Coroutine<int32_t> coroutine_;
+    Coroutine<int32_t, 2048> coroutine_;
 };
 
 struct BubbleSort {
-    static void Sort(Yields_t<int32_t> yield,
+    static void Sort(Yields<int32_t> yield,
                      std::vector<int32_t>::iterator begin,
                      std::vector<int32_t>::iterator end);
 };
 
 struct MergeSort {
-    static void Sort(Yields_t<int32_t> yield,
+    static void Sort(Yields<int32_t> yield,
+                     std::vector<int32_t>::iterator begin,
+                     std::vector<int32_t>::iterator end);
+};
+
+struct PMergeSort {
+    static void Sort(Yields<int32_t> yield,
                      std::vector<int32_t>::iterator begin,
                      std::vector<int32_t>::iterator end);
 };
 
 struct QuickSort {
-    static void Sort(Yields_t<int32_t> yield,
+    static void Sort(Yields<int32_t> yield,
                      std::vector<int32_t>::iterator begin,
                      std::vector<int32_t>::iterator end);
 };

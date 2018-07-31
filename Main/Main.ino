@@ -21,10 +21,11 @@ std::vector<std::function<std::unique_ptr<State>()>> kStateFactories{
     [&]() { return make_unique<RotatedRainbowState>(*led_strip); },
     [&]() { return make_unique<SortState>(*led_strip, 8, BubbleSort{}); },
     [&]() { return make_unique<SortState>(*led_strip, 1, MergeSort{}); },
+    [&]() { return make_unique<SortState>(*led_strip, 1, PMergeSort{}); },
     [&]() { return make_unique<SortState>(*led_strip, 4, QuickSort{}); },
     [&]() { return make_unique<MeteorState>(*led_strip); },
     [&]() { return make_unique<SleepState>(*led_strip); }};
-int32_t current_state_index = 4; // Quick Sort
+int32_t current_state_index = 4; // PMerge Sort
 
 void InitState() { current_state = kStateFactories[current_state_index](); }
 

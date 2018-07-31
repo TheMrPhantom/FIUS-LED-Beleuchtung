@@ -6,10 +6,11 @@
 #include <freertos/task.h>
 
 #include <functional>
+#include <stdexcept>
 
-template <class T> using Yields_t = std::function<void(T)>;
+template <class T> using Yields = std::function<void(T)>;
 
-template <class T> class Coroutine {
+template <class T, int32_t kStackSize> class Coroutine {
   public:
     Coroutine() noexcept = default;
 
@@ -24,17 +25,22 @@ template <class T> class Coroutine {
                 xTaskNotifyGive(my_handle);
                 ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
             };
+            printf("High water: %d\n", uxTaskGetStackHighWaterMark(nullptr));
             routine(std::move(yield), std::move(args)...);
             data.co_handle = nullptr;
             xTaskNotifyGive(my_handle);
             vTaskDelete(nullptr);
         };
         auto proxy = [](void *ptr) { static_cast<Data *>(ptr)->co_task(); };
-        xTaskCreate(proxy, "", 2048, data_.get(), 2, &data_->co_handle);
+        if (pdPASS != xTaskCreate(proxy, "", kStackSize, data_.get(), 1,
+                                  &data_->co_handle)) {
+            throw std::runtime_error{
+                "Failed to allocate memory for a Coroutine"};
+        }
     }
 
     ~Coroutine() noexcept {
-        if (*this) {
+        if (data_ && data_->co_handle) {
             vTaskDelete(data_->co_handle);
         }
     }
@@ -47,7 +53,7 @@ template <class T> class Coroutine {
     explicit operator bool() const { return data_ != nullptr; }
 
     bool Run() {
-        if (!data_ || data_->co_handle == nullptr) {
+        if (!data_ || !data_->co_handle) {
             return false;
         }
         xTaskNotifyGive(data_->co_handle);
