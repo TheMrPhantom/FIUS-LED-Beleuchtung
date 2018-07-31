@@ -1,6 +1,9 @@
 #pragma once
 
+#include "Coroutine.hpp"
+#include "LedStrip.hpp"
 #include "State.hpp"
+#include "Util.hpp"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -10,53 +13,49 @@
 
 class LedStrip;
 
-class SortStateBase : public State {
+class SortState : public State {
   public:
-    SortStateBase(LedStrip &led_strip, int32_t group_size);
-    ~SortStateBase() noexcept;
-    void Update() override;
+    template <class Algo>
+    SortState(LedStrip &led_strip, int32_t group_size, Algo)
+        : ids_(led_strip.PixelCount() / group_size), led_strip_{led_strip},
+          group_size_{group_size}, coroutine_{Algo::Sort, ids_.begin(),
+                                              ids_.end()} {
+        for (auto &color : ids_) {
+            int32_t num = RandomInt(0, 510);
+            if (num < 255) {
+                color = ((255 - num) << 16) | (num << 8);
+            } else {
+                num -= 255;
+                color = ((255 - num) << 8) | num;
+            }
+        }
+    }
 
-  protected:
-    void FinishedStep();
-    virtual void Sort() = 0;
+    void Update();
+
+  private:
+    void Display();
 
     std::vector<int32_t> ids_;
-
-  private:
     LedStrip &led_strip_;
     const int32_t group_size_;
-    TaskHandle_t my_task_;
-    TaskHandle_t co_task_;
+    Coroutine<int32_t> coroutine_;
 };
 
-class BubbleSortState : public SortStateBase {
-  public:
-    using SortStateBase::SortStateBase;
-
-  protected:
-    void Sort() override;
+struct BubbleSort {
+    static void Sort(Yields_t<int32_t> yield,
+                     std::vector<int32_t>::iterator begin,
+                     std::vector<int32_t>::iterator end);
 };
 
-class MergeSortState : public SortStateBase {
-  public:
-    using SortStateBase::SortStateBase;
-
-  protected:
-    void Sort() override;
-
-  private:
-    void Sort(std::vector<int32_t>::iterator begin,
-              std::vector<int32_t>::iterator end);
+struct MergeSort {
+    static void Sort(Yields_t<int32_t> yield,
+                     std::vector<int32_t>::iterator begin,
+                     std::vector<int32_t>::iterator end);
 };
 
-class QuickSortState : public SortStateBase {
-  public:
-    using SortStateBase::SortStateBase;
-
-  protected:
-    void Sort() override;
-
-  private:
-    void Sort(std::vector<int32_t>::iterator begin,
-              std::vector<int32_t>::iterator end);
+struct QuickSort {
+    static void Sort(Yields_t<int32_t> yield,
+                     std::vector<int32_t>::iterator begin,
+                     std::vector<int32_t>::iterator end);
 };

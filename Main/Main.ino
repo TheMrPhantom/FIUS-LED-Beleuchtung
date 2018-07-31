@@ -19,9 +19,9 @@ std::unique_ptr<State> current_state;
 std::vector<std::function<std::unique_ptr<State>()>> kStateFactories{
     [&]() { return make_unique<WhiteState>(*led_strip); },
     [&]() { return make_unique<RotatedRainbowState>(*led_strip); },
-    [&]() { return make_unique<BubbleSortState>(*led_strip, 8); },
-    [&]() { return make_unique<MergeSortState>(*led_strip, 1); },
-    [&]() { return make_unique<QuickSortState>(*led_strip, 4); },
+    [&]() { return make_unique<SortState>(*led_strip, 8, BubbleSort{}); },
+    [&]() { return make_unique<SortState>(*led_strip, 1, MergeSort{}); },
+    [&]() { return make_unique<SortState>(*led_strip, 4, QuickSort{}); },
     [&]() { return make_unique<MeteorState>(*led_strip); },
     [&]() { return make_unique<SleepState>(*led_strip); }};
 int32_t current_state_index = 4; // Quick Sort

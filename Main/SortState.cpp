@@ -1,84 +1,57 @@
 #include "SortState.hpp"
-#include "LedStrip.hpp"
-#include "Util.hpp"
 
 #include <algorithm>
 
-namespace {
-void Display(LedStrip &led_strip, const std::vector<int32_t> &ids) {
-    int32_t next_pixel = 0;
-    for (int32_t group = 0; group < ids.size(); ++group) {
-        int32_t pixel = next_pixel;
-        next_pixel = led_strip.PixelCount() * (group + 1) /
-                     static_cast<int32_t>(ids.size());
-        led_strip.SetColors(ids[group], pixel, next_pixel - pixel);
+void SortState::Update() {
+    if (coroutine_.Run()) {
+        Display();
     }
+}
+
+void SortState::Display() {
+    int32_t next_pixel = 0;
+    for (int32_t group = 0; group < ids_.size(); ++group) {
+        int32_t pixel = next_pixel;
+        next_pixel = led_strip_.PixelCount() * (group + 1) /
+                     static_cast<int32_t>(ids_.size());
+        led_strip_.SetColors(ids_[group], pixel, next_pixel - pixel);
+    }
+}
+
+namespace {
+template <class Iter>
+Iter MedianIter(Iter a, Iter b, Iter c) noexcept(noexcept(*a)) {
+    auto min = [](Iter a, Iter b) noexcept(noexcept(*a))->Iter {
+        return *a < *b ? a : b;
+    };
+    auto max = [](Iter a, Iter b) noexcept(noexcept(*a))->Iter {
+        return *a > *b ? a : b;
+    };
+    return max(min(a, b), min(max(a, b), c));
 }
 } // namespace
 
-SortStateBase::SortStateBase(LedStrip &led_strip, int32_t group_size)
-    : ids_(led_strip.PixelCount() / group_size), led_strip_{led_strip},
-      group_size_{group_size}, my_task_{xTaskGetCurrentTaskHandle()} {
-    for (auto &color : ids_) {
-        int32_t num = RandomInt(0, 510);
-        if (num < 255) {
-            color = ((255 - num) << 16) | (num << 8);
-        } else {
-            num -= 255;
-            color = ((255 - num) << 8) | num;
-        }
-    }
-    xTaskCreate(
-        [](void *ptr) {
-            ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-            auto &base = *static_cast<SortStateBase *>(ptr);
-            base.Sort();
-            base.co_task_ = nullptr;
-            xTaskNotifyGive(base.my_task_);
-            vTaskDelete(nullptr);
-        },
-        "", 2048, this, 2, &co_task_);
-}
-
-void SortStateBase::Update() {
-    if (co_task_) {
-        xTaskNotifyGive(co_task_);
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        Display(led_strip_, ids_);
-    }
-}
-
-SortStateBase::~SortStateBase() {
-    if (co_task_) {
-        vTaskDelete(co_task_);
-    }
-}
-
-void SortStateBase::FinishedStep() {
-    xTaskNotifyGive(my_task_);
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-}
-
-void BubbleSortState::Sort() {
-    for (int32_t end = ids_.size() - 1; end >= 1; --end) {
-        for (int32_t i = 0; i < end; ++i) {
-            if (ids_[i] > ids_[i + 1]) {
-                std::swap(ids_[i], ids_[i + 1]);
+void BubbleSort::Sort(Yields_t<int32_t> yield,
+                      std::vector<int32_t>::iterator begin,
+                      std::vector<int32_t>::iterator end) {
+    while (--end > begin) {
+        for (auto iter = begin; iter < end; ++iter) {
+            if (*iter > *(iter + 1)) {
+                std::swap(*iter, *(iter + 1));
             }
-            FinishedStep();
+            yield(0);
         }
     }
 }
 
-void MergeSortState::Sort() { Sort(ids_.begin(), ids_.end()); }
-
-void MergeSortState::Sort(std::vector<int32_t>::iterator begin,
-                          std::vector<int32_t>::iterator end) {
+void MergeSort::Sort(Yields_t<int32_t> yield,
+                     std::vector<int32_t>::iterator begin,
+                     std::vector<int32_t>::iterator end) {
     auto diff = end - begin;
     auto mid = begin + diff / 2;
     if (diff > 2) {
-        Sort(begin, mid);
-        Sort(mid, end);
+        Sort(yield, begin, mid);
+        Sort(yield, mid, end);
     }
     std::vector<int32_t> merge(begin, end);
     std::for_each(begin, end, [](auto &c) {
@@ -94,39 +67,26 @@ void MergeSortState::Sort(std::vector<int32_t>::iterator begin,
         if (left == left_end) {
             while (right != right_end) {
                 *(begin++) = *(right++);
-                FinishedStep();
+                yield(0);
             }
             return;
         }
         if (right == right_end) {
             while (left != left_end) {
                 *(begin++) = *(left++);
-                FinishedStep();
+                yield(0);
             }
             return;
         }
         *(begin++) = (*left <= *right) ? *(left++) : *(right++);
-        FinishedStep();
+        yield(0);
     }
 }
 
-void QuickSortState::Sort() { Sort(ids_.begin(), ids_.end()); }
+void QuickSort::Sort(Yields_t<int32_t> yield,
+                     std::vector<int32_t>::iterator begin,
+                     std::vector<int32_t>::iterator end) {
 
-namespace {
-template <class Iter>
-Iter MedianIter(Iter a, Iter b, Iter c) noexcept(noexcept(*a)) {
-    auto min = [](Iter a, Iter b) noexcept(noexcept(*a))->Iter {
-        return *a < *b ? a : b;
-    };
-    auto max = [](Iter a, Iter b) noexcept(noexcept(*a))->Iter {
-        return *a > *b ? a : b;
-    };
-    return max(min(a, b), min(max(a, b), c));
-}
-} // namespace
-
-void QuickSortState::Sort(std::vector<int32_t>::iterator begin,
-                          std::vector<int32_t>::iterator end) {
     auto c = end - begin;
     if (c < 2) {
         return;
@@ -134,16 +94,16 @@ void QuickSortState::Sort(std::vector<int32_t>::iterator begin,
     auto pivot = end - 1;
     std::swap(*MedianIter(begin + c / 4, begin + c / 2, begin + c * 3 / 4),
               *pivot);
-    FinishedStep();
+    yield(0);
     auto bound = begin;
     for (auto iter = begin; iter < end - 1; ++iter) {
         if (*iter < *pivot) {
             std::swap(*iter, *(bound++));
         }
-        FinishedStep();
+        yield(0);
     }
     std::swap(*bound, *pivot);
-    FinishedStep();
-    Sort(begin, bound);
-    Sort(bound + 1, end);
+    yield(0);
+    Sort(yield, begin, bound);
+    Sort(yield, bound + 1, end);
 }
