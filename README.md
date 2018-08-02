@@ -7,13 +7,9 @@
 
 1. In the directory where you want to clone this repository, execute:
 ```
-git clone --single-branch -b chroma https://github.com/FIUS/LED-Beleuchtung
+git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
 cd LED-Beleuchtung
-git submodule update --init
-cd arduino-esp32/tools
-python2 get.py
-cd ../..
-cp makeConfig.template.mk makeConfig.mk
+./configure
 ```
 2. Configure *makeConfig.mk* using a text editor.
 
