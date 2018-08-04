@@ -266,13 +266,13 @@ ifneq ($(FLASH_INFO),)
 endif
 	perl -e 'print "Build complete. Elapsed time: ", time()-$(START_TIME),  " seconds\n\n"'
 
-upload flash: all
+upload flash:
 	$(UPLOAD_COM)
 
-ota: all
+ota:
 	$(OTA_TOOL) -r -i $(ESP_ADDR) -p $(ESP_PORT) -a $(ESP_PWD) -f $(MAIN_EXE)
 
-http: all
+http:
 	$(HTTP_TOOL) --verbose -F image=@$(MAIN_EXE) --user $(HTTP_USR):$(HTTP_PWD) http://$(HTTP_ADDR)$(HTTP_URI)
 	echo "\n"
 
@@ -342,12 +342,12 @@ help:
 	echo "  all                  (default) Build the project application"
 	echo "  clean                Remove all intermediate build files"
 	echo "  lib                  Build a library with all involved object files"
-	echo "  flash                Build and and flash the project application"
-	echo "  flash_fs             Build and and flash file system (when applicable)"
-	echo "  ota                  Build and and flash via OTA"
+	echo "  flash                Flash the project application"
+	echo "  flash_fs             Build and flash file system (when applicable)"
+	echo "  ota                  Flash via OTA"
 	echo "                         Params: ESP_ADDR, ESP_PORT and ESP_PWD"
-	echo "  ota_fs               Build and and flash file system via OTA"
-	echo "  http                 Build and and flash via http (curl)"
+	echo "  ota_fs               Build and flash file system via OTA"
+	echo "  http                 Flash via http (curl)"
 	echo "                         Params: HTTP_ADDR, HTTP_URI, HTTP_PWD and HTTP_USR"
 	echo "  dump_flash           Dump the whole board flash memory to a file"
 	echo "  restore_flash        Restore flash memory from a previously dumped file"
