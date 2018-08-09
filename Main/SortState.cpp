@@ -114,11 +114,7 @@ void PMergeSortLevel(Yields<int32_t> yield,
     Coroutine<int32_t, 2048> right = [=](Yields<int32_t> yield_right) {
         PMergeSortLevel(yield_right, mid, end, depth - 1, quick);
     };
-    while (true) {
-        bool b1 = left.Run();
-        bool b2 = right.Run();
-        if (!b1 && !b2)
-            break;
+    while (left.Run() | right.Run()) {
         yield(0);
     }
 }
@@ -127,10 +123,6 @@ void PMergeSortLevel(Yields<int32_t> yield,
 void PMergeSort::Sort(Yields<int32_t> yield,
                       std::vector<int32_t>::iterator begin,
                       std::vector<int32_t>::iterator end) {
-    // int32_t depth = 0;
-    // for (int32_t c = end - begin - 1; c; c >>= 1) {
-    //    ++depth;
-    //}
     int32_t depth = 5;
     PMergeSortLevel(yield, begin, end, depth, true);
     while (--depth >= 0) {
