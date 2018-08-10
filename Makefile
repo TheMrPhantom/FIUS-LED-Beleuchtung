@@ -1,6 +1,6 @@
 CORE_DEBUG_LEVEL := 2
 C_FLAGS := -std=gnu11
-CPP_FLAGS := -std=gnu++17 -Os #-g3
+CPP_FLAGS := -std=gnu++17 -Os
 NPROCS := 4
 BUILD := /tmp/arduino-esp32
 
@@ -46,11 +46,7 @@ FLAGS := \
 	-DARDUINO_VARIANT=\"esp32\" \
 	-DESP32 \
 	-mlongcalls \
-	-DCORE_DEBUG_LEVEL=$(CORE_DEBUG_LEVEL) #\
-	-ffunction-sections \
-	-fdata-sections \
-	-fstrict-volatile-bitfields \
-	-fstack-protector \
+	-DCORE_DEBUG_LEVEL=$(CORE_DEBUG_LEVEL)
 
 FLASH_FLAGS = \
 	--chip esp32 \
