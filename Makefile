@@ -1,32 +1,22 @@
 CORE_DEBUG_LEVEL := 2
 C_FLAGS := -std=gnu11
 CPP_FLAGS := -std=gnu++17 -Os
+USER_FLAGS := -Wall
 NPROCS := 4
 BUILD := /tmp/arduino-esp32
 
 include makeConfig.mk
 
 SKETCH := Main/Main.ino
-INPUT_DIRS := \
-	Main \
-	arduino-esp32/libraries/WiFi/src \
-	libraries/FastLED
+USER_DIRS := Main arduino-esp32/libraries/WiFi/src libraries/FastLED
 
 ################################################################################
 
 LIBS := arduino-esp32/tools/sdk/lib
-INCLUDES := \
-	$(INPUT_DIRS) \
-	$(wildcard arduino-esp32/tools/sdk/include/*/) \
-	arduino-esp32/variants/esp32 \
-	arduino-esp32/cores/esp32
-USER_INPUTS := \
-	$(wildcard $(addsuffix /*.c, $(INPUT_DIRS))) \
-	$(wildcard $(addsuffix /*.cpp, $(INPUT_DIRS))) \
-	$(SKETCH)
-CORE_INPUTS := \
-	$(wildcard arduino-esp32/cores/esp32/*.c) \
-	$(wildcard arduino-esp32/cores/esp32/*.cpp)
+CORE_DIRS = arduino-esp32/variants/esp32 arduino-esp32/cores/esp32 $(wildcard arduino-esp32/tools/sdk/include/*/)
+INCLUDES :=$(USER_DIRS) $(CORE_DIRS)
+USER_INPUTS := $(wildcard $(addsuffix /*.c, $(USER_DIRS)) $(addsuffix /*.cpp, $(USER_DIRS))) $(SKETCH)
+CORE_INPUTS := $(wildcard $(addsuffix /*.c, $(CORE_DIRS)) $(addsuffix /*.cpp, $(CORE_DIRS)))
 USER_OUTPUTS := $(patsubst %, $(BUILD)/%.o, $(USER_INPUTS))
 CORE_OUTPUTS := $(patsubst %, $(BUILD)/%.o, $(CORE_INPUTS))
 C_COM := arduino-esp32/tools/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
@@ -47,7 +37,6 @@ FLAGS := \
 	-DESP32 \
 	-mlongcalls \
 	-DCORE_DEBUG_LEVEL=$(CORE_DEBUG_LEVEL)
-
 FLASH_FLAGS = \
 	--chip esp32 \
 	--port $(UPLOAD_PORT) \
@@ -86,17 +75,27 @@ listen:
 $(BUILD)/%.c.o: %.c
 	@echo $@
 	@mkdir -p $(dir $@)
-	@$(C_COM) $(FLAGS) $(C_FLAGS) -c $^ -o $@
+	@$(C_COM) $(FLAGS) $(C_FLAGS) $(USER_FLAGS) -c $^ -o $@
 
 $(BUILD)/%.cpp.o: %.cpp
 	@echo $@
 	@mkdir -p $(dir $@)
-	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) -c $^ -o $@
+	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c $^ -o $@
 
 $(BUILD)/%.ino.o: %.ino
 	@echo $@
 	@mkdir -p $(dir $@)
-	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) -c -x c++ $^ -o $@
+	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c -x c++ $^ -o $@
+
+$(BUILD)/arduino-esp32/%.c.o: arduino-esp32/%.c
+	@echo $@
+	@mkdir -p $(dir $@)
+	@$(C_COM) $(FLAGS) $(C_FLAGS) -c $^ -o $@
+
+$(BUILD)/arduino-esp32/%.cpp.o: arduino-esp32/%.cpp
+	@echo $@
+	@mkdir -p $(dir $@)
+	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) -c $^ -o $@
 
 $(BUILD)/arduino.ar: $(CORE_OUTPUTS)
 	@echo $@

@@ -10,7 +10,8 @@ void SortState::Update() {
 
 void SortState::Display() {
     int32_t next_pixel = 0;
-    for (int32_t group = 0; group < ids_.size(); ++group) {
+    for (int32_t group = 0; group < static_cast<int32_t>(ids_.size());
+         ++group) {
         int32_t pixel = next_pixel;
         next_pixel = led_strip_.PixelCount() * (group + 1) /
                      static_cast<int32_t>(ids_.size());
