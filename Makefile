@@ -1,6 +1,6 @@
 CORE_DEBUG_LEVEL := 2
 C_FLAGS := -std=gnu11
-CPP_FLAGS := -std=gnu++17 -Os
+CPP_FLAGS := -std=gnu++17 -Os #-g3
 NPROCS := 4
 BUILD := /tmp/arduino-esp32
 
@@ -46,34 +46,44 @@ FLAGS := \
 	-DARDUINO_VARIANT=\"esp32\" \
 	-DESP32 \
 	-mlongcalls \
-	-DCORE_DEBUG_LEVEL=$(CORE_DEBUG_LEVEL)
+	-DCORE_DEBUG_LEVEL=$(CORE_DEBUG_LEVEL) #\
+	-ffunction-sections \
+	-fdata-sections \
+	-fstrict-volatile-bitfields \
+	-fstack-protector \
 
-all: $(BUILD)/Main.bin $(BUILD)/Main.partitions.bin
+FLASH_FLAGS = \
+	--chip esp32 \
+	--port $(UPLOAD_PORT) \
+	--baud 921600 \
+	--before default_reset \
+	--after hard_reset write_flash \
+	-z \
+	--flash_mode dio \
+	--flash_freq 40m \
+	--flash_size detect
+
+all: $(BUILD)/Main.bin
 	
 clean:
 	rm -rf $(BUILD)
+
+bootloader:
+ifneq ($(shell stat -c %a $(UPLOAD_PORT)), 666)
+	sudo chmod 666 $(UPLOAD_PORT)
+endif
+	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) \
+		0xe000 arduino-esp32/tools/partitions/boot_app0.bin \
+		0x1000 arduino-esp32/tools/sdk/bin/bootloader_dio_40m.bin \
+		0x8000 arduino-esp32/tools/partitions/default.bin
 
 flash:
 ifneq ($(shell stat -c %a $(UPLOAD_PORT)), 666)
 	sudo chmod 666 $(UPLOAD_PORT)
 endif
-	@arduino-esp32/tools/esptool/esptool.py \
-		--chip esp32 \
-		--port $(UPLOAD_PORT) \
-		--baud 921600 \
-		--before default_reset \
-		--after hard_reset write_flash \
-		-z \
-		--flash_mode dio \
-		--flash_freq 40m \
-		--flash_size detect \
-		0xe000 arduino-esp32/tools/partitions/boot_app0.bin \
-		0x1000 arduino-esp32/tools/sdk/bin/bootloader_dio_40m.bin \
-		0x10000 $(BUILD)/Main.bin \
-		0x8000 $(BUILD)/Main.partitions.bin \
-		| sed -n '1!p'
+	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
 
-run:
+listen:
 	stty -F /dev/ttyS3 115200
 	cat /dev/ttyS3
 
@@ -110,9 +120,4 @@ $(BUILD)/Main.elf: $(USER_OUTPUTS) $(BUILD)/arduino.ar
 
 $(BUILD)/Main.bin: $(BUILD)/Main.elf
 	@echo $@
-	@python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $< \
-		| sed -n '1!p'
-
-$(BUILD)/Main.partitions.bin:
-	@echo $@
-	@python arduino-esp32/tools/gen_esp32part.py -q arduino-esp32/tools/partitions/default.csv $(BUILD)/Main.partitions.bin
+	@python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $<

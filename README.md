@@ -26,12 +26,16 @@ cd LED-Beleuchtung && \
 
 ## Building and Flashing
 
-`make` builds the project.
-
-Before flashing the build to the ESP32 board, follow these instructions:
+### Quick Start
 1. Connect the ESP32 board via USB.
 2. Set the USB device path as `UPLOAD_PORT` in your *makeConfig.mk* file.
+3. Execute `make all bootloader flash listen`.
 
-`make flash` flashes the most recent build to the ESP32 board. If you get `Permission denied: '<UPLOAD_PORT>'`, execute `sudo chmod 666 <UPLOAD_PORT>` and try `make flash` again.
+### Reference
+- `make` or `make all` builds the project.
+- `make bootloader` flashes the bootloader to the ESP32 board.
+- `make flash` flashes the most recent build to the ESP32 board.
+- `make listen` prints the output received from the ESP32 board.
+- `make clean` removes the build directory, causing a full rebuild when executing `make` or `make all` the next time.
 
-`make && make flash` does build and flash.
+When making alterations to the build, the bootloader doesn't need to be reflashed. Rebuilding and reflashing can therefore be done via `make all flash` or `make all flash listen` (depending on whether you want to print the output).
