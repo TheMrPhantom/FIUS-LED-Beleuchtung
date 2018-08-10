@@ -1,5 +1,7 @@
 #pragma once
 #include <FastLED.h>
+#undef min
+#undef max
 
 #include <vector>
 
