@@ -35,7 +35,7 @@ cd LED-Beleuchtung && \
 - `make` or `make all` builds the project.
 - `make bootloader` flashes the bootloader to the ESP32 board. Needs read/write access to the USB device path.
 - `make flash` flashes the most recent build to the ESP32 board. Needs read/write access to the USB device path.
-- `make listen` prints the output received from the ESP32 board. Needs read access to the USB device path. This can be cancelled with `ctrl`+`c`. Don't worry when *make* says it failed --- that's normal.
+- `make listen` prints the output received from the ESP32 board. Needs read access to the USB device path. This can be cancelled with `ctrl`+`c`. Don't worry when *make* says it failed &mdash; that's normal.
 - `make clean` removes the build directory, causing a full rebuild when executing `make` or `make all` the next time.
 
 In case the user doesn't have sufficient access rights, the alterations `sudo make bootloader`, `sudo make flash` and `sudo make listen` are needed.
