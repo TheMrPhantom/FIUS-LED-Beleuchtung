@@ -55,6 +55,7 @@ clean:
 
 bootloader:
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
+	@chmod +x arduino-esp32/tools/esptool/esptool.py
 	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) \
 		0xe000 arduino-esp32/tools/partitions/boot_app0.bin \
 		0x1000 arduino-esp32/tools/sdk/bin/bootloader_dio_40m.bin \
@@ -62,6 +63,7 @@ bootloader:
 
 flash:
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
+	@chmod +x arduino-esp32/tools/esptool/esptool.py
 	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
 
 listen:
@@ -112,4 +114,5 @@ $(BUILD)/Main.elf: $(USER_OUTPUTS) $(BUILD)/arduino.ar
 
 $(BUILD)/Main.bin: $(BUILD)/Main.elf
 	@echo $@
+	@chmod +x arduino-esp32/tools/esptool/esptool.py
 	@python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $<
