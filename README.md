@@ -20,8 +20,25 @@ In the directory where you want to clone this repository, execute:
 ```
 sudo apt-get install git make python-serial && \
 git clone -b chroma https://github.com/FIUS/LED-Beleuchtung && \
-cd LED-Beleuchtung && \
-./configure
+cd LED-Beleuchtung && ./configure
+```
+
+### Arch Linux
+
+In the directory where you want to clone this repository, execute:
+```
+sudo pacman -S git make python-pyserial && \
+git clone -b chroma https://github.com/FIUS/LED-Beleuchtung && \
+cd LED-Beleuchtung && ./configure
+```
+
+### OpenSUSE
+
+In the directory where you want to clone this repository, execute:
+```
+sudo zypper install git-core make python-pyserial && \
+git clone -b chroma https://github.com/FIUS/LED-Beleuchtung && \
+cd LED-Beleuchtung && ./configure
 ```
 
 ## Building and Flashing
