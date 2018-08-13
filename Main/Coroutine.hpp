@@ -25,7 +25,6 @@ template <class T, int32_t kStackSize> class Coroutine {
                 xTaskNotifyGive(my_handle);
                 ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
             };
-            printf("High water: %d\n", uxTaskGetStackHighWaterMark(nullptr));
             routine(std::move(yield), std::move(args)...);
             data.co_handle = nullptr;
             xTaskNotifyGive(my_handle);
