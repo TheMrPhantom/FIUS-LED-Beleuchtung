@@ -1,6 +1,21 @@
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-echo "Configuring $DIR"
-cd $DIR
+echo "Configuring..."
+if ! command -v git > '/dev/null'; then
+    >&2 echo "Error: you have to install 'git'"; 
+    exit 1;
+fi;
+if ! command -v make > '/dev/null'; then
+    >&2 echo "Error: you have to install 'git'";
+    exit 2;
+fi;
+if ! command -v python > '/dev/null'; then
+    >&2 echo "Error: you have to install 'python'";
+    exit 3;
+fi;
+if ! python -c "import serial" > '/dev/null' 2>&1; then
+    >&2 echo "Error: you have to install the python package 'serial'";
+    exit 4;
+fi;
+cd "${0%/*}"
 git submodule update --init
 cd arduino-esp32/tools
 python get.py
