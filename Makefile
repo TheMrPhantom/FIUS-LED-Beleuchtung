@@ -54,21 +54,18 @@ clean:
 	rm -rf $(BUILD)
 
 bootloader:
-ifneq ($(shell stat -c %a $(UPLOAD_PORT)), 666)
-	sudo chmod 666 $(UPLOAD_PORT)
-endif
+	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) \
 		0xe000 arduino-esp32/tools/partitions/boot_app0.bin \
 		0x1000 arduino-esp32/tools/sdk/bin/bootloader_dio_40m.bin \
 		0x8000 arduino-esp32/tools/partitions/default.bin
 
 flash:
-ifneq ($(shell stat -c %a $(UPLOAD_PORT)), 666)
-	sudo chmod 666 $(UPLOAD_PORT)
-endif
+	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
 
 listen:
+	[ -r $(UPLOAD_PORT) ] || exit 1
 	stty -F /dev/ttyS3 115200
 	cat /dev/ttyS3
 
