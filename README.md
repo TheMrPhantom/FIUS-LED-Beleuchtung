@@ -3,8 +3,8 @@
 
 ## Contents
 - [Installation Instructions](#installation-instructions)
--- [Windows](#windows)
--- [Ubuntu/Debian](#ubuntudebian)
+    - [Windows](#windows)
+    - [Ubuntu/Debian](#ubuntudebian)
 - [Building and Flashing](#building-and-flashing)
 
 ## Installation Instructions
