@@ -3,43 +3,66 @@
 static const char *const kWifiSsid = "Chroma";
 static const char *const kWifiPassword = "partyraum";
 
-WifiGateway::WifiGateway(std::function<void()> Callback)
-    : wifiServer_{80}, Callback_{Callback} {
+Request::Request(WiFiClient client) : client_(client) {
+    if (!client_) {
+        return;
+    }
+    bool newline = true;
+    while (client_.available()) {
+        char c = client_.read();
+        if (c == '\r') {
+            continue;
+        }
+        bool emptyline = newline;
+        newline = (c == '\n');
+        if (emptyline && newline) {
+            break;
+        }
+        message_ += c;
+    }
+    Serial.println("New connection.");
+}
+
+Request::Request(Request &&other) noexcept
+    : client_{std::move(other.client_)}, message_{std::move(other.message_)} {
+    other.client_ = WiFiClient{};
+}
+
+Request &Request::operator=(const Request &other) {
+    auto copy{other};
+    swap(*this, copy);
+    return *this;
+}
+
+Request &Request::operator=(Request &&other) noexcept {
+    client_ = std::move(other.client_);
+    message_ = std::move(other.message_);
+    other.client_ = WiFiClient{};
+    return *this;
+}
+
+void swap(Request &lhs, Request &rhs) {
+    using std::swap;
+    swap(lhs.client_, rhs.client_);
+    swap(lhs.message_, rhs.message_);
+}
+
+Request::operator bool() const noexcept { return static_cast<bool>(client_); }
+
+const char *Request::message() const noexcept { return message_.c_str(); }
+
+void Request::answer(const char *ans) noexcept {
+    client_.print(ans);
+    Serial.println("Answered request.");
+}
+
+WifiGateway::WifiGateway() : wifi_server_{80} {
     WiFi.softAP(kWifiSsid, kWifiPassword);
-    wifiServer_.begin();
+    wifi_server_.begin();
     Serial.print("WiFi connected. IP address: ");
     Serial.println(WiFi.softAPIP());
 }
 
-WifiGateway::~WifiGateway() { wifiServer_.end(); }
+WifiGateway::~WifiGateway() { wifi_server_.end(); }
 
-void WifiGateway::Update() {
-    if (WiFiClient client = wifiServer_.available()) {
-        Serial.println("New client:");
-        String currentLine;
-        while (client.available()) {
-            char c = client.read();
-            if (c == '\r') {
-                continue;
-            }
-            Serial.print(c);
-            if (c != '\n') {
-                currentLine += c;
-                continue;
-            }
-            if (currentLine.length() != 0) {
-                currentLine = "";
-                continue;
-            }
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-Type: text/html");
-            client.println("Connection: close");
-            client.println();
-            client.println("Hello, World!.");
-            Serial.println("Answered request.");
-        }
-        client.stop();
-        Serial.println("Connection closed.");
-        Callback_();
-    }
-}
+Request WifiGateway::NextRequest() { return Request{wifi_server_.available()}; }

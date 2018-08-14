@@ -16,7 +16,7 @@ template <class T, int32_t kStackSize> class Coroutine {
 
     template <class Function, class... Args>
     Coroutine(Function routine, const Args &... args)
-        : data_{make_unique<Data>()} {
+        : data_{std::make_unique<Data>()} {
         data_->co_task = [routine = std::move(routine), args..., &data = *data_,
                           my_handle = xTaskGetCurrentTaskHandle()]() {
             ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
