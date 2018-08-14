@@ -3,12 +3,14 @@
 #include <WiFi.h>
 
 #include <experimental/optional>
+#include <experimental/string_view>
 #include <functional>
 #include <queue>
 #include <string>
 
 class Request {
   public:
+    Request() noexcept = default;
     explicit Request(WiFiClient client);
     Request(const Request &) = default;
     Request(Request &&other) noexcept;
@@ -16,8 +18,8 @@ class Request {
     Request &operator=(Request &&other) noexcept;
     friend void swap(Request &lhs, Request &rhs);
     explicit operator bool() const noexcept;
-    const char *message() const noexcept;
-    void answer(const char *ans) noexcept;
+    std::experimental::string_view message() const noexcept;
+    void answer(std::experimental::string_view ans) noexcept;
 
   private:
     mutable WiFiClient client_;

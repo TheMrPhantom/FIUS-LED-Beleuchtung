@@ -3,10 +3,7 @@
 static const char *const kWifiSsid = "Chroma";
 static const char *const kWifiPassword = "partyraum";
 
-Request::Request(WiFiClient client) : client_(client) {
-    if (!client_) {
-        return;
-    }
+Request::Request(WiFiClient client) : client_{std::move(client)} {
     bool newline = true;
     while (client_.available()) {
         char c = client_.read();
@@ -20,7 +17,9 @@ Request::Request(WiFiClient client) : client_(client) {
         }
         message_ += c;
     }
-    Serial.println("New connection.");
+    if (!*this) {
+        client_ = WiFiClient{};
+    }
 }
 
 Request::Request(Request &&other) noexcept
@@ -47,13 +46,24 @@ void swap(Request &lhs, Request &rhs) {
     swap(lhs.message_, rhs.message_);
 }
 
-Request::operator bool() const noexcept { return static_cast<bool>(client_); }
+Request::operator bool() const noexcept { return !message_.empty(); }
 
-const char *Request::message() const noexcept { return message_.c_str(); }
+std::experimental::string_view Request::message() const noexcept {
+    if (!*this) {
+        throw std::logic_error{
+            "Called Request::message on an empty Request object"};
+    }
+    return message_;
+}
 
-void Request::answer(const char *ans) noexcept {
-    client_.print(ans);
-    Serial.println("Answered request.");
+void Request::answer(std::experimental::string_view ans) noexcept {
+    if (!*this) {
+        throw std::logic_error{
+            "Called Request::answer on an empty Request object"};
+    }
+    if (client_.print(ans.data()) != ans.size()) {
+        throw std::runtime_error{"Failed to answer request"};
+    }
 }
 
 WifiGateway::WifiGateway() : wifi_server_{80} {

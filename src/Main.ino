@@ -31,16 +31,21 @@ int32_t current_state_index = 4; // PMerge Sort
 void InitState() { current_state = kStateFactories[current_state_index](); }
 
 void AnswerRequest(Request &req) {
-    Serial.println("Message:");
-    Serial.print(req.message());
+    Serial.println("New connection. Message:");
+    Serial.print(req.message().data());
     ++current_state_index;
     current_state_index %= kStateFactories.size();
     InitState();
-    req.answer("HTTP/1.1 200 OK\n"
-               "Content-Type: text/html\n"
-               "Connection: close\n"
-               "\n"
-               "Hello, World!.\n");
+    try {
+        req.answer("HTTP/1.1 200 OK\n"
+                   "Content-Type: text/html\n"
+                   "Connection: close\n"
+                   "\n"
+                   "Hello, World!.\n");
+        Serial.println("Answered request.");
+    } catch (std::runtime_error &) {
+        // Ignore that answering failed
+    }
 }
 
 void setup() {
