@@ -73,27 +73,29 @@ listen:
 $(BUILD)/%.c.o: %.c
 	@echo $@
 	@mkdir -p $(dir $@)
-	@$(C_COM) $(FLAGS) $(C_FLAGS) $(USER_FLAGS) -c $^ -o $@
+	@$(C_COM) $(FLAGS) $(C_FLAGS) $(USER_FLAGS) -c $< -o $@
 
 $(BUILD)/%.cpp.o: %.cpp
 	@echo $@
 	@mkdir -p $(dir $@)
-	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c $^ -o $@
+	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c $< -o $@
 
 $(BUILD)/%.ino.o: %.ino
 	@echo $@
 	@mkdir -p $(dir $@)
-	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c -x c++ $^ -o $@
+	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c -x c++ $< -o $@
 
 $(BUILD)/arduino-esp32/%.c.o: arduino-esp32/%.c
 	@echo $@
 	@mkdir -p $(dir $@)
-	@$(C_COM) $(FLAGS) $(C_FLAGS) -c $^ -o $@
+	@$(C_COM) $(FLAGS) $(C_FLAGS) -c $< -o $@
 
 $(BUILD)/arduino-esp32/%.cpp.o: arduino-esp32/%.cpp
 	@echo $@
 	@mkdir -p $(dir $@)
-	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) -c $^ -o $@
+	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) -c $< -o $@
+
+-include $(USER_OUTPUTS:%.o=%.d) $(CORE_OUTPUTS:%.o=%.d)
 
 $(BUILD)/arduino.ar: $(CORE_OUTPUTS)
 	@echo $@
