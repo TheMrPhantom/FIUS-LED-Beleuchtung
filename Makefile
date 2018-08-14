@@ -7,8 +7,8 @@ BUILD := /tmp/arduino-esp32
 
 include makeConfig.mk
 
-SKETCH := Main/Main.ino
-USER_DIRS := Main arduino-esp32/libraries/WiFi/src libraries/FastLED
+SKETCH := src/Main.ino
+USER_DIRS := src arduino-esp32/libraries/WiFi/src libraries/FastLED
 
 ################################################################################
 
