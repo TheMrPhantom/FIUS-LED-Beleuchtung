@@ -1,8 +1,7 @@
 CORE_DEBUG_LEVEL := 2
-C_FLAGS := -std=gnu11
+C_FLAGS := -std=gnu11 -Os
 CPP_FLAGS := -std=gnu++17 -Os
 USER_FLAGS := -Wall
-NPROCS := 4
 BUILD := /tmp/arduino-esp32
 
 include makeConfig.mk
