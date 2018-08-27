@@ -14,13 +14,28 @@
 1. Install the Windows Subsystem for Linux and your Linux distribution of choice.
 2. Follow the installation instructions for that distribution.
 
+### NixOS (or other Linux distros with the Nix package manager installed)
+
+If git isn't installed, install it via:
+```
+nix-env -i git
+```
+In the directory where you want to clone this repository, execute:
+```
+git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
+```
+Now, whenever you want to work on the project, load the development environment via:
+```
+nix-shell
+```
+(This installs the dependencies described in default.nix and opens a shell where they're available, without polluting your user space. You can close that shell simply via `exit`.)
+
 ### Ubuntu/Debian
 
 In the directory where you want to clone this repository, execute:
 ```
 sudo apt-get install git make python-serial && \
-git clone -b chroma https://github.com/FIUS/LED-Beleuchtung && \
-cd LED-Beleuchtung && ./configure
+git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
 ```
 
 ### Arch Linux
@@ -28,8 +43,7 @@ cd LED-Beleuchtung && ./configure
 In the directory where you want to clone this repository, execute:
 ```
 sudo pacman -S git make python-pyserial && \
-git clone -b chroma https://github.com/FIUS/LED-Beleuchtung && \
-cd LED-Beleuchtung && ./configure
+git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
 ```
 
 ### OpenSUSE
@@ -37,8 +51,7 @@ cd LED-Beleuchtung && ./configure
 In the directory where you want to clone this repository, execute:
 ```
 sudo zypper install git-core make python-pyserial && \
-git clone -b chroma https://github.com/FIUS/LED-Beleuchtung && \
-cd LED-Beleuchtung && ./configure
+git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
 ```
 
 ## Building and Flashing
