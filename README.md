@@ -24,7 +24,7 @@ In the directory where you want to clone this repository, execute:
 ```
 git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
 ```
-Now, whenever you want to work on the project, load the development environment via:
+Now, whenever you want to work on the project, `cd` into LED-Beleuchtung and load the development environment via:
 ```
 nix-shell
 ```
