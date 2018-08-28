@@ -61,17 +61,19 @@ git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
 
 ### Quick Start
 1. Connect the ESP32 board via USB.
-2. Set the USB device path as `UPLOAD_PORT` in your *makeConfig.mk* file.
-3. Execute `make all bootloader flash listen`.
+2. Execute `make`
+3. Set the USB device path as `UPLOAD_PORT` in your *makeConfig.mk* file.
+4. Execute `sudo make bootloader flash listen`.
 
 ### Reference
-- `make` or `make all` builds the project.
-- `make bootloader` flashes the bootloader to the ESP32 board. Needs read/write access to the USB device path.
-- `make flash` flashes the most recent build to the ESP32 board. Needs read/write access to the USB device path.
-- `make listen` prints the output received from the ESP32 board. Needs read access to the USB device path. This can be cancelled with `ctrl`+`c`. Don't worry when *make* says it failed &ndash; that's normal.
+- `make` or `make all` builds the project. When executed for the first time, it downloads the neccessary compilers and tools beforehand and creates a file called *makeConfig.mk*.
+- `make bootloader` flashes the bootloader to the ESP32 board.
+- `make flash` flashes the most recent build to the ESP32 board.
+- `make listen` prints the output received from the ESP32 board. This can be cancelled with `ctrl`+`c`. Don't worry when *make* says it failed &ndash; that's normal.
 - `make clean` removes the build directory, causing a full rebuild when executing `make` or `make all` the next time.
 
-In case the user doesn't have sufficient access rights, the alterations `sudo make bootloader`, `sudo make flash` and `sudo make listen` are needed.
+In *makeConfig.mk*, you have to specify the upload port which will be accesed by `make bootloader`, `make flash` and `make listen`. In case your user doesn't have sufficient access rights, execute those commands with the `sudo ` 
+prefix.
 
 Different options can be combined. Example: `sudo make all flash listen` rebuilds, flashes the build prints the output.
 
