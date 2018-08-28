@@ -9,6 +9,8 @@
     - [Arch Linux](#arch-linux)
     - [OpenSUSE](#opensuse)
 - [Building and Flashing](#building-and-flashing)
+    - [Quick Start](#quick-start)
+    - [Reference](#reference)
 
 ## Installation Instructions
 
