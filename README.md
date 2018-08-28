@@ -27,7 +27,7 @@ nix-env -i git
 ```
 In the directory where you want to clone this repository, execute:
 ```
-git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
+git clone https://github.com/FIUS/LED-Beleuchtung
 ```
 Now, whenever you want to work on the project, `cd` into LED-Beleuchtung and load the development environment via:
 ```
@@ -41,7 +41,7 @@ nix-shell
 In the directory where you want to clone this repository, execute:
 ```
 sudo apt-get install git make python-serial && \
-git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
+git clone https://github.com/FIUS/LED-Beleuchtung
 ```
 
 ### Arch Linux
@@ -49,7 +49,7 @@ git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
 In the directory where you want to clone this repository, execute:
 ```
 sudo pacman -S git make python-pyserial && \
-git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
+git clone https://github.com/FIUS/LED-Beleuchtung
 ```
 
 ### OpenSUSE
@@ -57,7 +57,7 @@ git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
 In the directory where you want to clone this repository, execute:
 ```
 sudo zypper install git-core make python-pyserial && \
-git clone -b chroma https://github.com/FIUS/LED-Beleuchtung
+git clone https://github.com/FIUS/LED-Beleuchtung
 ```
 
 ## Building and Flashing
