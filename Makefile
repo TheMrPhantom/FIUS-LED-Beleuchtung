@@ -49,8 +49,8 @@ FLASH_FLAGS = \
 
 all: $(BUILD)/Main.bin
 
-makeConfig.mk:
-	@echo "Configuring..."
+dependency-check:
+	@echo "Installing development environment..."
 	@if ! command -v git > '/dev/null'; then \
 		>&2 echo "Error: you have to install 'git'"; \
 		exit 1; \
@@ -67,18 +67,24 @@ makeConfig.mk:
 		>&2 echo "Error: you have to install the python package 'serial'"; \
 		exit 4; \
 	fi;
+
+makeConfig.mk:
+	@ cp makeConfig.template.mk makeConfig.mk
+
+arduino-esp32/tools/dist:
 	@ git submodule update --init
 	@ cd arduino-esp32/tools && python get.py
 	@ if command -v arduino-esp32-nix-patch > '/dev/null'; then \
 		arduino-esp32-nix-patch; \
 	fi;
-	@ cp makeConfig.template.mk makeConfig.mk
-	@echo "You can specify an upload port by editing makeConfig.mk"
-	
+
+install: dependency-check makeConfig.mk arduino-esp32/tools/dist
+	@echo "Done. You can specify an upload port by editing makeConfig.mk."
+
 clean:
 	rm -rf $(BUILD)
 
-bootloader: makeConfig.mk
+bootloader: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@chmod +x arduino-esp32/tools/esptool/esptool.py
 	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) \
@@ -86,7 +92,7 @@ bootloader: makeConfig.mk
 		0x1000 arduino-esp32/tools/sdk/bin/bootloader_dio_40m.bin \
 		0x8000 arduino-esp32/tools/partitions/default.bin
 
-flash: makeConfig.mk
+flash: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@chmod +x arduino-esp32/tools/esptool/esptool.py
 	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
@@ -96,13 +102,13 @@ listen:
 	stty -F /dev/ttyS3 115200
 	cat /dev/ttyS3
 
-%.o: makeConfig.mk
+%.o: install
 
-%.ar: makeConfig.mk
+%.ar: install
 
-%.elf: makeConfig.mk
+%.elf: install
 
-%.bin: makeConfig.mk
+%.bin: install
 
 $(BUILD)/%.c.o: %.c
 	@echo $@

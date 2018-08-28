@@ -28,9 +28,8 @@ in stdenv.mkDerivation rec {
   buildInputs = [
     git
     gnumake
-    (python3.withPackages (pkgs: with pkgs; [
-      pyserial
-    ]))
+    (python3.withPackages (pkgs: with pkgs; [ pyserial ]))
     patch-bin
   ];
+  shellHook = "make install";
 }
