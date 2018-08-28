@@ -6,7 +6,7 @@
     - [Windows](#windows)
     - [NixOS](#nixos-or-other-linux-distros-with-the-nix-package-manager-installed)
     - [Ubuntu/Debian](#ubuntudebian)
-    - [Arch Linux](#arch)
+    - [Arch Linux](#arch-linux)
     - [OpenSUSE](#opensuse)
 - [Building and Flashing](#building-and-flashing)
 
