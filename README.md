@@ -4,7 +4,10 @@
 ## Contents
 - [Installation Instructions](#installation-instructions)
     - [Windows](#windows)
+    - [NixOS](#nixos)
     - [Ubuntu/Debian](#ubuntudebian)
+    - [Arch Linux](#arch)
+    - [OpenSUSE](#opensuse)
 - [Building and Flashing](#building-and-flashing)
 
 ## Installation Instructions
