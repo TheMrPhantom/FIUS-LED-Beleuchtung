@@ -4,7 +4,7 @@
 ## Contents
 - [Installation Instructions](#installation-instructions)
     - [Windows](#windows)
-    - [NixOS](#nixos)
+    - [NixOS](##nixos-or-other-linux-distros-with-the-nix-package-manager-installed)
     - [Ubuntu/Debian](#ubuntudebian)
     - [Arch Linux](#arch)
     - [OpenSUSE](#opensuse)
