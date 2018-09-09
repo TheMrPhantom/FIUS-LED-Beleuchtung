@@ -25,8 +25,9 @@ std::vector<std::function<std::unique_ptr<State>()>> kStateFactories{
     [&]() { return std::make_unique<SortState>(*led_strip, 1, PMergeSort{}); },
     [&]() { return std::make_unique<SortState>(*led_strip, 4, QuickSort{}); },
     [&]() { return std::make_unique<MeteorState>(*led_strip); },
+    [&]() { return std::make_unique<SmoothLightState>(*led_strip); },
     [&]() { return std::make_unique<SleepState>(*led_strip); }};
-int32_t current_state_index = 4; // PMerge Sort
+int32_t current_state_index = 1; // PMerge Sort
 
 void InitState() { current_state = kStateFactories[current_state_index](); }
 
