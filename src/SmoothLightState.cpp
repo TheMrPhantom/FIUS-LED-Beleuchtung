@@ -9,7 +9,6 @@ SmoothLightState::SmoothLightState(LedStrip &led_strip) : strip(led_strip)
 
 void SmoothLightState::Initialize()
 {
-    
 }
 
 void SmoothLightState::Update()
@@ -23,6 +22,10 @@ void SmoothLightState::Update()
         }
         byte colorToSet = (byte)(activeColor - (changeLength - i));
         strip.SetColor(colorByID(colorToSet), ledToSet);
+    }
+    for (int i = activeLED - 30; i >= 0; i--)
+    {
+        strip.SetColor(colorByID(activeColor), i);
     }
     activeLED++;
     activeLED %= strip.PixelCount();
