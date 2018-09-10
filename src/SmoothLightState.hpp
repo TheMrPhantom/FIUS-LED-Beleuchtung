@@ -17,6 +17,6 @@ class SmoothLightState : public State {
     int activeLED=0;
     int changeLength=30;
     CRGB colorByID(byte colorNumber);
-
+    LedStrip &strip;
 
 };
