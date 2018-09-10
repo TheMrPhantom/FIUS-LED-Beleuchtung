@@ -17,13 +17,13 @@ void SmoothLightState::Update()
     {
         if (i < activeLED)
         {
-            strip.SetColor(colorByID((byte)(colorToSet + changeLength)), i);
+            strip.SetColor(colorByID((byte)(activeColor + changeLength)), i);
         }
         else if (i >= activeLED && i < activeLED + 30)
         {
             int numberInTransition = i - activeLED;
             numberInTransition = changeLength - numberInTransition;
-            strip.SetColor(colorByID((byte)(colorToSet + numberInTransition)), i);
+            strip.SetColor(colorByID((byte)(activeColor + numberInTransition)), i);
         }
     }
 
