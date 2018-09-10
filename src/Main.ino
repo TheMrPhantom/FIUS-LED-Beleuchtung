@@ -1,6 +1,7 @@
 #include "FrameTimer.hpp"
 #include "LedStrip.hpp"
 #include "MeteorState.hpp"
+#include "SmoothLightState.hpp"
 #include "RotatedRainbowState.hpp"
 #include "SleepState.hpp"
 #include "SortState.hpp"
