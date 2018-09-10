@@ -12,7 +12,7 @@ class SmoothLightState : public State {
     void Update() override;
 
   private:
-    
+    void Initialize();
     int activeColor=0;
     int activeLED=0;
     int changeLength=30;
