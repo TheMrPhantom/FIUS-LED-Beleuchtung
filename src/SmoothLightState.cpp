@@ -7,6 +7,11 @@ SmoothLightState::SmoothLightState(LedStrip &led_strip) : strip(led_strip)
     Initialize();
 }
 
+void SmoothLightState::Initialize()
+{
+    
+}
+
 void SmoothLightState::Update()
 {
     for (int i = changeLength; i > 0; i++)
