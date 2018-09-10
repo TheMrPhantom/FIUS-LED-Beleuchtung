@@ -13,7 +13,7 @@ class SmoothLightState : public State {
 
   private:
     void Initialize();
-    int activeColor=0;
+    byte activeColor=0;
     int activeLED=0;
     int changeLength=30;
     CRGB colorByID(byte colorNumber);

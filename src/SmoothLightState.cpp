@@ -13,22 +13,26 @@ void SmoothLightState::Initialize()
 
 void SmoothLightState::Update()
 {
-    for (int i = changeLength; i > 0; i++)
+    for (int i = 0; i < strip.PixelCount(); i++)
     {
-        int ledToSet = activeLED - i;
-        if (ledToSet < 0)
+        if (i < activeLED)
         {
-            break;
+            strip.SetColor(colorByID((byte)(colorToSet + changeLength)), i);
         }
-        byte colorToSet = (byte)(activeColor - (changeLength - i));
-        strip.SetColor(colorByID(colorToSet), ledToSet);
+        else if (i >= activeLED && i < activeLED + 30)
+        {
+            int numberInTransition = i - activeLED;
+            numberInTransition = changeLength - numberInTransition;
+            strip.SetColor(colorByID((byte)(colorToSet + numberInTransition)), i);
+        }
     }
-    for (int i = activeLED - 30; i >= 0; i--)
-    {
-        strip.SetColor(colorByID(activeColor), i);
-    }
+
     activeLED++;
-    activeLED %= strip.PixelCount();
+    if (activeLED >= strip.PixelCount())
+    {
+        activeLED = 0;
+        colorToSet += changeLength;
+    }
 }
 
 CRGB SmoothLightState::colorByID(byte colorNumber)
