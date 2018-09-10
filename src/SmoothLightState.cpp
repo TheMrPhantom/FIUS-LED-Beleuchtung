@@ -31,7 +31,7 @@ void SmoothLightState::Update()
     if (activeLED >= strip.PixelCount())
     {
         activeLED = 0;
-        colorToSet += changeLength;
+        activeColor += changeLength;
     }
 }
 
