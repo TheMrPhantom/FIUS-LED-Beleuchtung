@@ -1,7 +1,6 @@
 #pragma once
+#include "LedStrip.hpp"
 #include "State.hpp"
-
-#include <FastLED.h>
 
 class LedStrip;
 

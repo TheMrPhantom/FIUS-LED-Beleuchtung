@@ -1,7 +1,6 @@
 #pragma once
+#include "LedStrip.hpp"
 #include "State.hpp"
-
-#include <FastLED.h>
 
 class LedStrip;
 
@@ -13,10 +12,9 @@ class SmoothLightState : public State {
 
   private:
     void Initialize();
-    byte activeColor=0;
-    int activeLED=0;
-    int changeLength=30;
+    byte activeColor = 0;
+    int activeLED = 0;
+    int changeLength = 30;
     CRGB colorByID(byte colorNumber);
     LedStrip &strip;
-
 };
