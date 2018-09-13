@@ -47,7 +47,7 @@ FLASH_FLAGS = \
 	--flash_freq 40m \
 	--flash_size detect
 
-all: $(BUILD)/Main.bin
+all: $(BUILD)/Main.bin $(BUILD)/spiffs.bin
 
 dependency-check:
 	@echo "Installing development environment..."
@@ -78,7 +78,11 @@ arduino-esp32/tools/dist:
 		arduino-esp32-nix-patch; \
 	fi;
 
-install: dependency-check makeConfig.mk arduino-esp32/tools/dist
+mkspiffs/mkspiffs:
+	@ git submodule update --init
+	@ cd mkspiffs && make dist
+
+install: dependency-check makeConfig.mk arduino-esp32/tools/dist mkspiffs/mkspiffs
 	@echo "Done. You can specify an upload port by editing makeConfig.mk."
 
 clean:
@@ -96,6 +100,7 @@ flash: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@chmod +x arduino-esp32/tools/esptool/esptool.py
 	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
+	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x110000 $(BUILD)/spiffs.bin
 
 listen:
 	[ -r $(UPLOAD_PORT) ] || exit 1
@@ -157,3 +162,6 @@ $(BUILD)/Main.bin: $(BUILD)/Main.elf
 	@echo $@
 	@chmod +x arduino-esp32/tools/esptool/esptool.py
 	@python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $<
+
+$(BUILD)/spiffs.bin: $(wildcard spiffs/**/*)
+	mkspiffs/mkspiffs -c spiffs -b 4096 -p 256 -s 0x100000 $@
