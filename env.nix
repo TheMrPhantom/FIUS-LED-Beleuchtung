@@ -28,6 +28,24 @@ with import <nixpkgs> {}; let
     ${patch-cmd [ zlib ]} ${elf}/xtensa-esp32-elf/bin/strip
   '';
   patch-bin = pkgs.writeShellScriptBin "arduino-esp32-nix-patch" patch-script;
+  mkspiffs = stdenv.mkDerivation rec {
+    name = "mkspiffs";
+    src = fetchgit {
+      url = "https://github.com/igrr/mkspiffs";
+      rev = "0.2.3";
+      deepClone = true;
+      sha256 = "0lgw8iyz57qc2l9nvn054cpsl3piik4n63gw7bp7rpci03xazi9j";
+    };
+    installPhase = ''
+      make dist
+      mkdir -p $out/bin
+      cp mkspiffs $out/bin
+    '';
+    buildInputs = [ git ];
+    meta.description = "Tool to build and unpack SPIFFS images.";
+    meta.license = "MIT";
+    meta.homepage = https://github.com/igrr/mkspiffs;
+  };
 in stdenv.mkDerivation rec {
   name = "led-beleuchtung-env";
   phases = [ "installPhase" "fixupPhase" ];
@@ -38,6 +56,7 @@ in stdenv.mkDerivation rec {
     ln -s ${(python3.withPackages (pkgs: with pkgs; [ pyserial ]))}/bin/python $out/bin/python
     ln -s ${git}/bin/git $out/bin/git
     ln -s ${gnumake}/bin/make $out/bin/make
+    ln -s ${mkspiffs}/bin/mkspiffs $out/bin/mkspiffs
   '';
   nativeBuildInputs = [
     makeWrapper
