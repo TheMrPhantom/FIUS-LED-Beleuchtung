@@ -49,7 +49,7 @@ FLASH_FLAGS = \
 
 all: $(BUILD)/Main.bin $(BUILD)/spiffs.bin
 
-dependency-check:
+check-dependencies:
 	@echo "Installing development environment..."
 	@if ! command -v git > '/dev/null'; then \
 		>&2 echo "Error: you have to install 'git'"; \
@@ -71,18 +71,32 @@ dependency-check:
 makeConfig.mk:
 	@ cp makeConfig.template.mk makeConfig.mk
 
-arduino-esp32/tools/dist:
-	@ git submodule update --init
+arduino-esp32/tools/esptool/esptool.py $(C_COM) $(CPP_COM) $(AR_COM):
+	@ git submodule update --init -- arduino-esp32
 	@ cd arduino-esp32/tools && python get.py
 	@ if command -v arduino-esp32-nix-patch > '/dev/null'; then \
 		arduino-esp32-nix-patch; \
 	fi;
 
-mkspiffs/mkspiffs:
-	@ git submodule update --init
+check-libraries:
+	@ git submodule update --init -- libraries
+
+ifeq (, $(shell which mkspiffs))
+
+MKSPIFFS := mkspiffs/mkspiffs
+MKSPIFFS_TARGET := $(MKSPIFFS)
+
+$(MKSPIFFS):
+	@ git submodule update --init --recursive -- mkspiffs
 	@ cd mkspiffs && make dist
 
-install: dependency-check makeConfig.mk arduino-esp32/tools/dist mkspiffs/mkspiffs
+else
+
+MKSPIFFS := mkspiffs
+
+endif
+
+install: check-dependencies makeConfig.mk arduino-esp32/tools/esptool/esptool.py $(C_COM) $(CPP_COM) $(AR_COM) check-libraries $(MKSPIFFS_TARGET)
 	@echo "Done. You can specify an upload port by editing makeConfig.mk."
 
 clean:
@@ -164,4 +178,4 @@ $(BUILD)/Main.bin: $(BUILD)/Main.elf
 	@python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $<
 
 $(BUILD)/spiffs.bin: $(wildcard spiffs/**/*)
-	mkspiffs/mkspiffs -c spiffs -b 4096 -p 256 -s 0x100000 $@
+	$(MKSPIFFS) -c spiffs -b 4096 -p 256 -s 0x100000 $@
