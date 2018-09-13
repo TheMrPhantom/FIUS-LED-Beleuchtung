@@ -47,10 +47,10 @@ FLASH_FLAGS = \
 	--flash_freq 40m \
 	--flash_size detect
 
-all: $(BUILD)/Main.bin $(BUILD)/spiffs.bin
+all: install
+	@ $(MAKE) $(BUILD)/Main.bin $(BUILD)/spiffs.bin
 
 check-dependencies:
-	@echo "Installing development environment..."
 	@if ! command -v git > '/dev/null'; then \
 		>&2 echo "Error: you have to install 'git'"; \
 		exit 1; \
@@ -70,8 +70,10 @@ check-dependencies:
 
 makeConfig.mk:
 	@ cp makeConfig.template.mk makeConfig.mk
+	@echo "You can specify an upload port by editing makeConfig.mk."
 
 arduino-esp32/tools/esptool/esptool.py $(C_COM) $(CPP_COM) $(AR_COM):
+	@ echo "Installing development environment..."
 	@ git submodule update --init -- arduino-esp32
 	@ cd arduino-esp32/tools && python get.py
 	@ if command -v arduino-esp32-nix-patch > '/dev/null'; then \
@@ -96,8 +98,7 @@ MKSPIFFS := mkspiffs
 
 endif
 
-install: check-dependencies makeConfig.mk arduino-esp32/tools/esptool/esptool.py $(C_COM) $(CPP_COM) $(AR_COM) check-libraries $(MKSPIFFS_TARGET)
-	@echo "Done. You can specify an upload port by editing makeConfig.mk."
+install: check-dependencies arduino-esp32/tools/esptool/esptool.py $(C_COM) $(CPP_COM) $(AR_COM) $(MKSPIFFS_TARGET) check-libraries makeConfig.mk
 
 clean:
 	rm -rf $(BUILD)
@@ -120,14 +121,6 @@ listen:
 	[ -r $(UPLOAD_PORT) ] || exit 1
 	stty -F /dev/ttyS3 115200
 	cat /dev/ttyS3
-
-%.o: install
-
-%.ar: install
-
-%.elf: install
-
-%.bin: install
 
 $(BUILD)/%.c.o: %.c
 	@echo $@
