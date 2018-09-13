@@ -1,27 +1,27 @@
-CORE_DEBUG_LEVEL := 2
-C_FLAGS := -std=gnu11 -Os
-CPP_FLAGS := -std=gnu++17 -Os
-USER_FLAGS := -Wall
-BUILD := ./build
+CORE_DEBUG_LEVEL = 2
+C_FLAGS = -std=gnu11 -Os
+CPP_FLAGS = -std=gnu++17 -Os
+USER_FLAGS = -Wall
+BUILD = ./build
 
 include makeConfig.mk
 
-SKETCH := src/Main.ino
-USER_DIRS := src arduino-esp32/libraries/WiFi/src libraries/FastLED
+SKETCH = src/Main.ino
+USER_DIRS = src arduino-esp32/libraries/WiFi/src libraries/FastLED
 
 ################################################################################
 
-LIBS := arduino-esp32/tools/sdk/lib
+LIBS = arduino-esp32/tools/sdk/lib
 CORE_DIRS = arduino-esp32/variants/esp32 arduino-esp32/cores/esp32 $(wildcard arduino-esp32/tools/sdk/include/*/)
-INCLUDES :=$(USER_DIRS) $(CORE_DIRS)
-USER_INPUTS := $(wildcard $(addsuffix /*.c, $(USER_DIRS)) $(addsuffix /*.cpp, $(USER_DIRS))) $(SKETCH)
-CORE_INPUTS := $(wildcard $(addsuffix /*.c, $(CORE_DIRS)) $(addsuffix /*.cpp, $(CORE_DIRS)))
-USER_OUTPUTS := $(patsubst %, $(BUILD)/%.o, $(USER_INPUTS))
-CORE_OUTPUTS := $(patsubst %, $(BUILD)/%.o, $(CORE_INPUTS))
-C_COM := arduino-esp32/tools/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
-CPP_COM := arduino-esp32/tools/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++
-AR_COM := arduino-esp32/tools/xtensa-esp32-elf/bin/xtensa-esp32-elf-ar
-FLAGS := \
+INCLUDES =$(USER_DIRS) $(CORE_DIRS)
+USER_INPUTS = $(wildcard $(addsuffix /*.c, $(USER_DIRS)) $(addsuffix /*.cpp, $(USER_DIRS))) $(SKETCH)
+CORE_INPUTS = $(wildcard $(addsuffix /*.c, $(CORE_DIRS)) $(addsuffix /*.cpp, $(CORE_DIRS)))
+USER_OUTPUTS = $(patsubst %, $(BUILD)/%.o, $(USER_INPUTS))
+CORE_OUTPUTS = $(patsubst %, $(BUILD)/%.o, $(CORE_INPUTS))
+C_COM = arduino-esp32/tools/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
+CPP_COM = arduino-esp32/tools/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++
+AR_COM = arduino-esp32/tools/xtensa-esp32-elf/bin/xtensa-esp32-elf-ar
+FLAGS = \
 	$(patsubst %, -I%, $(INCLUDES)) \
 	-MMD \
 	-DESP_PLATFORM \
@@ -85,8 +85,8 @@ check-libraries:
 
 ifeq (, $(shell which mkspiffs))
 
-MKSPIFFS := mkspiffs/mkspiffs
-MKSPIFFS_TARGET := $(MKSPIFFS)
+MKSPIFFS = mkspiffs/mkspiffs
+MKSPIFFS_TARGET = $(MKSPIFFS)
 
 $(MKSPIFFS):
 	@ git submodule update --init --recursive -- mkspiffs
@@ -94,7 +94,7 @@ $(MKSPIFFS):
 
 else
 
-MKSPIFFS := mkspiffs
+MKSPIFFS = mkspiffs
 
 endif
 
