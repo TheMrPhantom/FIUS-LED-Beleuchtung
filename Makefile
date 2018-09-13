@@ -51,19 +51,19 @@ all: install
 	@ $(MAKE) $(BUILD)/Main.bin $(BUILD)/spiffs.bin
 
 check-dependencies:
-	@if ! command -v git > '/dev/null'; then \
+	@ if ! command -v git > '/dev/null'; then \
 		>&2 echo "Error: you have to install 'git'"; \
 		exit 1; \
 	fi;
-	@if ! command -v make > '/dev/null'; then \
+	@ if ! command -v make > '/dev/null'; then \
 		>&2 echo "Error: you have to install 'git'"; \
 		exit 2; \
 	fi;
-	@if ! command -v python > '/dev/null'; then \
+	@ if ! command -v python > '/dev/null'; then \
 		>&2 echo "Error: you have to install 'python'"; \
 		exit 3; \
 	fi;
-	@if ! python -c "import serial" > '/dev/null' 2>&1; then \
+	@ if ! python -c "import serial" > '/dev/null' 2>&1; then \
 		>&2 echo "Error: you have to install the python package 'serial'"; \
 		exit 4; \
 	fi;
@@ -105,17 +105,17 @@ clean:
 
 bootloader: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
-	@chmod +x arduino-esp32/tools/esptool/esptool.py
-	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) \
+	@ chmod +x arduino-esp32/tools/esptool/esptool.py
+	@ arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) \
 		0xe000 arduino-esp32/tools/partitions/boot_app0.bin \
 		0x1000 arduino-esp32/tools/sdk/bin/bootloader_dio_40m.bin \
 		0x8000 arduino-esp32/tools/partitions/default.bin
 
 flash: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
-	@chmod +x arduino-esp32/tools/esptool/esptool.py
-	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
-	@arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x110000 $(BUILD)/spiffs.bin
+	@ chmod +x arduino-esp32/tools/esptool/esptool.py
+	@ arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
+	@ arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x110000 $(BUILD)/spiffs.bin
 
 listen:
 	[ -r $(UPLOAD_PORT) ] || exit 1
@@ -123,39 +123,39 @@ listen:
 	cat /dev/ttyS3
 
 $(BUILD)/%.c.o: %.c
-	@echo $@
-	@mkdir -p $(dir $@)
-	@$(C_COM) $(FLAGS) $(C_FLAGS) $(USER_FLAGS) -c $< -o $@
+	@ echo $@
+	@ mkdir -p $(dir $@)
+	@ $(C_COM) $(FLAGS) $(C_FLAGS) $(USER_FLAGS) -c $< -o $@
 
 $(BUILD)/%.cpp.o: %.cpp
-	@echo $@
-	@mkdir -p $(dir $@)
-	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c $< -o $@
+	@ echo $@
+	@ mkdir -p $(dir $@)
+	@ $(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c $< -o $@
 
 $(BUILD)/%.ino.o: %.ino
-	@echo $@
-	@mkdir -p $(dir $@)
-	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c -x c++ $< -o $@
+	@ echo $@
+	@ mkdir -p $(dir $@)
+	@ $(CPP_COM) $(FLAGS) $(CPP_FLAGS) $(USER_FLAGS) -c -x c++ $< -o $@
 
 $(BUILD)/arduino-esp32/%.c.o: arduino-esp32/%.c
-	@echo $@
-	@mkdir -p $(dir $@)
-	@$(C_COM) $(FLAGS) $(C_FLAGS) -c $< -o $@
+	@ echo $@
+	@ mkdir -p $(dir $@)
+	@ $(C_COM) $(FLAGS) $(C_FLAGS) -c $< -o $@
 
 $(BUILD)/arduino-esp32/%.cpp.o: arduino-esp32/%.cpp
-	@echo $@
-	@mkdir -p $(dir $@)
-	@$(CPP_COM) $(FLAGS) $(CPP_FLAGS) -c $< -o $@
+	@ echo $@
+	@ mkdir -p $(dir $@)
+	@ $(CPP_COM) $(FLAGS) $(CPP_FLAGS) -c $< -o $@
 
 -include $(USER_OUTPUTS:%.o=%.d) $(CORE_OUTPUTS:%.o=%.d)
 
 $(BUILD)/arduino.ar: $(CORE_OUTPUTS)
-	@echo $@
-	@$(AR_COM) cru $@ $^
+	@ echo $@
+	@ $(AR_COM) cru $@ $^
 
 $(BUILD)/Main.elf: $(USER_OUTPUTS) $(BUILD)/arduino.ar
-	@echo $@
-	@$(CPP_COM) \
+	@ echo $@
+	@ $(CPP_COM) \
 		-nostdlib \
 		$(patsubst %, -L%, $(LIBS)) -Larduino-esp32/tools/sdk/ld \
 		-T esp32_out.ld -T esp32.common.ld -T esp32.rom.ld -T esp32.peripherals.ld -T esp32.rom.spiram_incompatible_fns.ld \
@@ -166,9 +166,10 @@ $(BUILD)/Main.elf: $(USER_OUTPUTS) $(BUILD)/arduino.ar
 		-Wl,--end-group -Wl,-EL
 
 $(BUILD)/Main.bin: $(BUILD)/Main.elf
-	@echo $@
-	@chmod +x arduino-esp32/tools/esptool/esptool.py
-	@python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $<
+	@ echo $@
+	@ chmod +x arduino-esp32/tools/esptool/esptool.py
+	@ python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $<
 
 $(BUILD)/spiffs.bin: $(wildcard spiffs/**/*)
+	echo $@
 	$(MKSPIFFS) -c spiffs -b 4096 -p 256 -s 0x100000 $@
