@@ -173,4 +173,4 @@ $(BUILD)/Main.bin: $(BUILD)/Main.elf
 
 $(BUILD)/spiffs.bin: $(wildcard spiffs/**/*)
 	echo $@
-	$(MKSPIFFS) -c spiffs -b 4096 -p 256 -s 0x100000 $@
+	@ $(MKSPIFFS) -c spiffs -b 4096 -p 256 -s 0x100000 $@
