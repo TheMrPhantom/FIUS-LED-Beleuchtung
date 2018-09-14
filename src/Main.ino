@@ -1,15 +1,17 @@
 #include "FrameTimer.hpp"
 #include "LedStrip.hpp"
 #include "MeteorState.hpp"
-#include "SmoothLightState.hpp"
 #include "RotatedRainbowState.hpp"
+#include "SPIFFS.h"
 #include "SleepState.hpp"
+#include "SmoothLightState.hpp"
 #include "SortState.hpp"
 #include "Util.hpp"
 #include "WhiteState.hpp"
 #include "WifiGateway.hpp"
 
 #include <experimental/optional>
+#include <fstream>
 #include <vector>
 
 const int32_t kPixelCount = 850;
@@ -39,14 +41,24 @@ void AnswerRequest(Request &req) {
     current_state_index %= kStateFactories.size();
     InitState();
     try {
-        req.answer("HTTP/1.1 200 OK\n"
-                   "Content-Type: text/html\n"
-                   "Connection: close\n"
-                   "\n"
-                   "Hello, World!.\n");
+        static std::string filename = "/spiffs/http/index.html";
+        std::ifstream file{filename};
+        if (!file) {
+            throw std::runtime_error("Failed to open file " + filename);
+        }
+        std::string answer = "HTTP/1.1 200 OK\n"
+                             "Content-Type: text/html\n"
+                             "Connection: close\n"
+                             "\n";
+        answer.insert(answer.end(), std::istreambuf_iterator<char>{file},
+                      std::istreambuf_iterator<char>{});
+        Serial.println(answer.c_str());
+        req.answer(answer.c_str());
         Serial.println("Answered request.");
-    } catch (std::runtime_error &) {
-        // Ignore that answering failed
+    } catch (std::exception &e) {
+        Serial.println();
+        Serial.println(e.what()); // TODO: print to stderr
+        Serial.println();
     }
 }
 
@@ -54,6 +66,7 @@ void setup() {
     Serial.begin(115200);
     led_strip.emplace(kPixelCount);
     wifi_gateway.emplace();
+    SPIFFS.begin();
     InitState();
 }
 
