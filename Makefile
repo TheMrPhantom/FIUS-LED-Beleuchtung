@@ -58,7 +58,7 @@ all: install
 	@ $(MAKE) $(BUILD)/Main.bin $(BUILD)/spiffs.bin
 
 bootloader: install
-	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
+	@ [ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 126
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
 	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLASH_FLAGS) \
 		0xe000 arduino-esp32/tools/partitions/boot_app0.bin \
@@ -66,26 +66,27 @@ bootloader: install
 		0x8000 arduino-esp32/tools/partitions/default.bin
 
 erase:
-	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
+	@ [ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 126
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
 	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLAGS) erase_flash
 
 flash: install
-	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
+	@ [ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 126
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
 	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLASH_FLAGS) \
 		0x10000 $(BUILD)/Main.bin \
 		0x291000 $(BUILD)/spiffs.bin
 
 reboot:
-	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
+	@ [ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 126
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
 	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLAGS) run
 
 listen:
-	[ -r $(UPLOAD_PORT) ] || exit 1
-	stty -F $(UPLOAD_PORT) 115200
-	tail -f $(UPLOAD_PORT)
+	@ echo Listening to $(UPLOAD_PORT) ...
+	@ [ -r $(UPLOAD_PORT) ] || exit 126
+	@ stty -F $(UPLOAD_PORT) 115200
+	@ tail -f $(UPLOAD_PORT)
 
 clean:
 	rm -rf $(BUILD)
@@ -136,7 +137,7 @@ check-libraries:
 
 makeConfig.mk:
 	@ cp makeConfig.template.mk makeConfig.mk
-	@echo "You can specify an upload port by editing makeConfig.mk."
+	@ echo "You can specify an upload port by editing makeConfig.mk."
 
 install: check-dependencies $(ARDUINO_ESP32_TARGETS) $(MKSPIFFS_TARGET) check-libraries makeConfig.mk
 
@@ -193,4 +194,4 @@ $(BUILD)/spiffs.bin: spiffs/
 	@ $(MKSPIFFS) -c spiffs -b 4096 -p 256 -s 0x16F000 $@
 
 spiffs/:
-	mkdir -p spiffs
+	@ mkdir -p spiffs
