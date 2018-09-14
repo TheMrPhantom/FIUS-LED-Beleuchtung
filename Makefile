@@ -72,8 +72,8 @@ flash: install
 
 listen:
 	[ -r $(UPLOAD_PORT) ] || exit 1
-	stty -F /dev/ttyS3 115200
-	cat /dev/ttyS3
+	stty -F $(UPLOAD_PORT) 115200
+	cat $(UPLOAD_PORT)
 
 clean:
 	rm -rf $(BUILD)
