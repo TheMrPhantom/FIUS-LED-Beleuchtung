@@ -73,8 +73,9 @@ erase:
 flash: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
-	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
-	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLASH_FLAGS) 0x110000 $(BUILD)/spiffs.bin
+	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLASH_FLAGS) \
+		0x10000 $(BUILD)/Main.bin \
+		0x291000 $(BUILD)/spiffs.bin
 
 reboot:
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
@@ -188,5 +189,5 @@ $(BUILD)/Main.bin: $(BUILD)/Main.elf
 	@ python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $<
 
 $(BUILD)/spiffs.bin: $(wildcard spiffs/**/*)
-	echo $@
-	@ $(MKSPIFFS) -c spiffs -b 4096 -p 256 -s 0x100000 $@
+	@ echo $@
+	@ $(MKSPIFFS) -c spiffs -b 4096 -p 256 -s 0x16F000 $@
