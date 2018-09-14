@@ -123,7 +123,7 @@ MKSPIFFS_TARGET = $(MKSPIFFS)
 
 $(MKSPIFFS):
 	@ git submodule update --init --recursive -- mkspiffs
-	@ cd mkspiffs && make dist
+	@ cd mkspiffs && make clean && make dist CPPFLAGS="-DSPIFFS_OBJ_META_LEN=4" BUILD_CONFIG_NAME="-arduino-esp32"
 
 else
 

@@ -39,7 +39,7 @@ let
     '';
     nativeBuildInputs = [ makeWrapper ];
   };
-  mkspiffs = (import (fetchTarball "https://github.com/haslersn/nixpkgs/archive/mkspiffs-0.2.3.tar.gz") {}).mkspiffs;
+  mkspiffs-arduino-esp32 = (import (fetchTarball "https://github.com/haslersn/nixpkgs/archive/mkspiffs-0.2.3.tar.gz") {}).mkspiffs-arduino-esp32;
 in
 
 buildEnv {
@@ -48,7 +48,7 @@ buildEnv {
     arduino-esp32-nix-patch
     git
     gnumake
-    mkspiffs
+    mkspiffs-arduino-esp32
     (python3.withPackages (pkgs: with pkgs; [ pyserial ]))
   ];
 }
