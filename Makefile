@@ -73,7 +73,7 @@ flash: install
 listen:
 	[ -r $(UPLOAD_PORT) ] || exit 1
 	stty -F $(UPLOAD_PORT) 115200
-	cat $(UPLOAD_PORT)
+	tail -f $(UPLOAD_PORT)
 
 clean:
 	rm -rf $(BUILD)
