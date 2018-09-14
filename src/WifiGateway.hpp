@@ -18,8 +18,8 @@ class Request {
     Request &operator=(Request &&other) noexcept;
     friend void swap(Request &lhs, Request &rhs);
     explicit operator bool() const noexcept;
-    std::experimental::string_view message() const noexcept;
-    void answer(std::experimental::string_view ans) noexcept;
+    std::experimental::string_view message() const;
+    void answer(std::experimental::string_view ans);
 
   private:
     mutable WiFiClient client_;

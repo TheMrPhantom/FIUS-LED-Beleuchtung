@@ -48,7 +48,7 @@ void swap(Request &lhs, Request &rhs) {
 
 Request::operator bool() const noexcept { return !message_.empty(); }
 
-std::experimental::string_view Request::message() const noexcept {
+std::experimental::string_view Request::message() const {
     if (!*this) {
         throw std::logic_error{
             "Called Request::message on an empty Request object"};
@@ -56,7 +56,7 @@ std::experimental::string_view Request::message() const noexcept {
     return message_;
 }
 
-void Request::answer(std::experimental::string_view ans) noexcept {
+void Request::answer(std::experimental::string_view ans) {
     if (!*this) {
         throw std::logic_error{
             "Called Request::answer on an empty Request object"};
