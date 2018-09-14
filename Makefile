@@ -41,12 +41,13 @@ FLAGS = \
 	-DESP32 \
 	-mlongcalls \
 	-DCORE_DEBUG_LEVEL=$(CORE_DEBUG_LEVEL)
-FLASH_FLAGS = \
+ESPTOOL_FLAGS = \
 	--chip esp32 \
 	--port $(UPLOAD_PORT) \
-	--baud 921600 \
-	--before default_reset \
-	--after hard_reset write_flash \
+	--baud 921600
+ESPTOOL_FLASH_FLAGS = \
+	$(ESPTOOL_FLAGS) \
+	write_flash \
 	-z \
 	--flash_mode dio \
 	--flash_freq 40m \
@@ -59,7 +60,7 @@ all: install
 bootloader: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
-	@ arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) \
+	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLASH_FLAGS) \
 		0xe000 arduino-esp32/tools/partitions/boot_app0.bin \
 		0x1000 arduino-esp32/tools/sdk/bin/bootloader_dio_40m.bin \
 		0x8000 arduino-esp32/tools/partitions/default.bin
@@ -67,8 +68,13 @@ bootloader: install
 flash: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
-	@ arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
-	@ arduino-esp32/tools/esptool/esptool.py $(FLASH_FLAGS) 0x110000 $(BUILD)/spiffs.bin
+	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLASH_FLAGS) 0x10000 $(BUILD)/Main.bin
+	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLASH_FLAGS) 0x110000 $(BUILD)/spiffs.bin
+
+reboot:
+	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
+	@ chmod +x arduino-esp32/tools/esptool/esptool.py
+	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLAGS) run
 
 listen:
 	[ -r $(UPLOAD_PORT) ] || exit 1
