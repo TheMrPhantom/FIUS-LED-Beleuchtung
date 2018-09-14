@@ -65,6 +65,11 @@ bootloader: install
 		0x1000 arduino-esp32/tools/sdk/bin/bootloader_dio_40m.bin \
 		0x8000 arduino-esp32/tools/partitions/default.bin
 
+erase:
+	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
+	@ chmod +x arduino-esp32/tools/esptool/esptool.py
+	@ arduino-esp32/tools/esptool/esptool.py $(ESPTOOL_FLAGS) erase_flash
+
 flash: install
 	[ -r $(UPLOAD_PORT) ] && [ -w $(UPLOAD_PORT) ] || exit 1
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
