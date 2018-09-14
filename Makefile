@@ -188,6 +188,9 @@ $(BUILD)/Main.bin: $(BUILD)/Main.elf
 	@ chmod +x arduino-esp32/tools/esptool/esptool.py
 	@ python arduino-esp32/tools/esptool/esptool.py --chip esp32 elf2image --flash_mode dio --flash_freq 40m --flash_size 4MB -o $@ $<
 
-$(BUILD)/spiffs.bin: $(wildcard spiffs/**/*)
+$(BUILD)/spiffs.bin: spiffs/
 	@ echo $@
 	@ $(MKSPIFFS) -c spiffs -b 4096 -p 256 -s 0x16F000 $@
+
+spiffs/:
+	mkdir -p spiffs
