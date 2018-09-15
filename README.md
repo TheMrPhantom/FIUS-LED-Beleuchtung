@@ -73,11 +73,12 @@ git clone https://github.com/FIUS/LED-Beleuchtung
 - `make bootloader` flashes the bootloader to the ESP32 board.
 - `make flash` flashes the most recent build to the ESP32 board.
 - `make listen` prints the output received from the ESP32 board. This can be cancelled with `ctrl`+`c`. Don't worry when *make* says it failed &ndash; that's normal.
+- `make reboot` reboots the ESP32 board.
+- `make erase` erases the flash memory of the ESP32 board (erases the bootloader and everything else).
 - `make clean` removes the build directory, causing a full rebuild when executing `make` or `make all` the next time.
 
-In *makeConfig.mk*, you have to specify the upload port which will be accesed by `make bootloader`, `make flash` and `make listen`. In case your user doesn't have sufficient access rights, execute those commands with the `sudo ` 
-prefix.
+In *makeConfig.mk*, you have to specify the upload port which will be accesed by `make bootloader`, `make flash`, `make listen`, `make reboot` and `make erase`. In case your user doesn't have sufficient access rights, execute those commands with the `sudo ` prefix.
 
-Different options can be combined. Example: `sudo make all flash listen` rebuilds, flashes the build prints the output.
+Different options can be combined. Example: `sudo make all flash listen` rebuilds, flashes the build and prints the output.
 
 When making alterations to the build, the bootloader doesn't need to be reflashed.
