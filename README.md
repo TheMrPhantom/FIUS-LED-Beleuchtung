@@ -2,15 +2,19 @@
 # LED-Beleuchtung
 
 ## Contents
-- [Installation Instructions](#installation-instructions)
-    - [Windows](#windows)
-    - [NixOS](#nixos-or-other-linux-distros-with-the-nix-package-manager-installed)
-    - [Ubuntu/Debian](#ubuntudebian)
-    - [Arch Linux](#arch-linux)
-    - [OpenSUSE](#opensuse)
-- [Building and Flashing](#building-and-flashing)
-    - [Quick Start](#quick-start)
-    - [Reference](#reference)
+- [LED-Beleuchtung](#led-beleuchtung)
+    - [Contents](#contents)
+    - [Installation Instructions](#installation-instructions)
+        - [Windows](#windows)
+        - [NixOS (or other Linux distros with the Nix package manager installed)](#nixos-or-other-linux-distros-with-the-nix-package-manager-installed)
+        - [Ubuntu/Debian](#ubuntu-debian)
+        - [Arch Linux](#arch-linux)
+        - [OpenSUSE](#opensuse)
+    - [Building and Flashing](#building-and-flashing)
+        - [Quick Start](#quick-start)
+        - [Reference](#reference)
+    - [clang-format](#clang-format)
+        - [Visual Studio Code](#visual-studio-code)
 
 ## Installation Instructions
 
@@ -82,3 +86,15 @@ In *makeConfig.mk*, you have to specify the upload port which will be accesed by
 Different options can be combined. Example: `sudo make all flash listen` rebuilds, flashes the build and prints the output.
 
 When making alterations to the build, the bootloader doesn't need to be reflashed.
+
+## clang-format
+
+This project's code is formatted using *clang-format*. The specific style is defined in `_clang-format`. Many editors have *clang-format* extensions.
+
+### Visual Studio Code
+
+The C++ extension `ms-vscode.cpptools` already comes with *clang-format* and formatting can by default be done via `ctrl`+`shift`+`I`. Alternatively, you can open your user settings (`ctrl`+`,`) and add:
+
+```
+    "editor.formatOnSave": true,
+```
