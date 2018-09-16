@@ -38,7 +38,7 @@ Now, whenever you want to work on the project, `cd` into LED-Beleuchtung and loa
 nix run
 ```
 (This installs the dependencies described in default.nix and opens a shell where they're available, without polluting your user space. You can close that shell simply via `exit`. If you want to use a shell other than bash inside 
-*nix run*, for example *fish*, try `nix run --command fish`.)
+*nix run*, for example *fish*, try `nix run -c fish`.)
 
 ## Ubuntu/Debian
 
