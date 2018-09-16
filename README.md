@@ -35,10 +35,10 @@ git clone https://github.com/FIUS/LED-Beleuchtung
 ```
 Now, whenever you want to work on the project, `cd` into LED-Beleuchtung and load the development environment via:
 ```
-nix-shell
+nix run
 ```
 (This installs the dependencies described in default.nix and opens a shell where they're available, without polluting your user space. You can close that shell simply via `exit`. If you want to use a shell other than bash inside 
-*nix-shell*, for example *fish*, try `nix-shell --command fish`.)
+*nix run*, for example *fish*, try `nix run --command fish`.)
 
 ## Ubuntu/Debian
 
