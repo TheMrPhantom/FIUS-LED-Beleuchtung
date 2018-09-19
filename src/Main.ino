@@ -2,22 +2,24 @@
 #include "LedStrip.hpp"
 #include "MeteorState.hpp"
 #include "RotatedRainbowState.hpp"
-#include "SPIFFS.h"
 #include "SleepState.hpp"
 #include "SmoothLightState.hpp"
 #include "SortState.hpp"
 #include "Util.hpp"
+#include "WebServer.hpp"
 #include "WhiteState.hpp"
 #include "WifiGateway.hpp"
 
 #include <experimental/optional>
 #include <fstream>
+#include <iostream>
 #include <vector>
 
 const int32_t kPixelCount = 850;
 
 std::experimental::optional<LedStrip> led_strip;
 std::experimental::optional<WifiGateway> wifi_gateway;
+std::experimental::optional<WebServer> web_server;
 std::unique_ptr<State> current_state;
 
 std::vector<std::function<std::unique_ptr<State>()>> kStateFactories{
@@ -34,31 +36,16 @@ int32_t current_state_index = 7; // SmoothLight
 
 void InitState() { current_state = kStateFactories[current_state_index](); }
 
-void AnswerRequest(Request &req) {
-    Serial.println("New connection. Message:");
-    Serial.print(req.message().data());
-    ++current_state_index;
-    current_state_index %= kStateFactories.size();
-    InitState();
-    try {
-        static std::string filename = "/spiffs/http/index.html";
-        std::ifstream file{filename};
-        if (!file) {
-            throw std::runtime_error("Failed to open file " + filename);
+void HandleWifiRequest() {
+    if (auto req = wifi_gateway->NextRequest()) {
+        try {
+            auto message = req.message();
+            std::cout << "New request: " << message << '\n';
+            req.answer(web_server->Process(message));
+            std::cout << "Answered request.\n";
+        } catch (std::exception &e) {
+            std::cerr << '\n' << e.what() << "\n\n";
         }
-        std::string answer = "HTTP/1.1 200 OK\n"
-                             "Content-Type: text/html\n"
-                             "Connection: close\n"
-                             "\n";
-        answer.insert(answer.end(), std::istreambuf_iterator<char>{file},
-                      std::istreambuf_iterator<char>{});
-        Serial.println(answer.c_str());
-        req.answer(answer.c_str());
-        Serial.println("Answered request.");
-    } catch (std::exception &e) {
-        Serial.println();
-        Serial.println(e.what()); // TODO: print to stderr
-        Serial.println();
     }
 }
 
@@ -67,15 +54,19 @@ void setup() {
     led_strip.emplace(kPixelCount);
     wifi_gateway.emplace();
     SPIFFS.begin();
+    web_server.emplace();
+    web_server->Wip_SetCallback([&]() {
+        ++current_state_index;
+        current_state_index %= kStateFactories.size();
+        InitState();
+    });
     InitState();
 }
 
 void loop() {
     static FrameTimer timer{33};
 
-    if (auto req = wifi_gateway->NextRequest()) {
-        AnswerRequest(req);
-    }
+    HandleWifiRequest();
     while (timer.NextFrame()) {
         static int32_t frame = 0;
         ++frame;
