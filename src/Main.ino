@@ -39,9 +39,9 @@ void InitState() { current_state = kStateFactories[current_state_index](); }
 void HandleWifiRequest() {
     if (auto req = wifi_gateway->NextRequest()) {
         try {
-            auto message = req.message();
+            auto message = req.Message();
             std::cout << "New request: " << message << '\n';
-            req.answer(web_server->Process(message));
+            req.Answer(web_server->Process(message));
             std::cout << "Answered request.\n";
         } catch (std::exception &e) {
             std::cerr << '\n' << e.what() << "\n\n";

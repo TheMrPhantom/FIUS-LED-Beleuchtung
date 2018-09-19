@@ -51,7 +51,7 @@ void swap(WifiRequestHandle &lhs, WifiRequestHandle &rhs) {
 
 WifiRequestHandle::operator bool() const noexcept { return !message_.empty(); }
 
-std::experimental::string_view WifiRequestHandle::message() const {
+std::experimental::string_view WifiRequestHandle::Message() const {
     if (!*this) {
         throw std::logic_error{"Called WifiRequestHandle::message on an empty "
                                "WifiRequestHandle object"};
@@ -59,7 +59,7 @@ std::experimental::string_view WifiRequestHandle::message() const {
     return message_;
 }
 
-void WifiRequestHandle::answer(std::experimental::string_view ans) {
+void WifiRequestHandle::Answer(std::experimental::string_view ans) {
     if (!*this) {
         throw std::logic_error{"Called WifiRequestHandle::answer on an empty "
                                "WifiRequestHandle object"};
