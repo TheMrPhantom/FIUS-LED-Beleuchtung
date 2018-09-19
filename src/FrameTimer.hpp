@@ -5,6 +5,7 @@
 class FrameTimer {
   public:
     FrameTimer(int32_t frame_time);
+    int32_t FrameCount();
     bool NextFrame();
     void Debug();
 

@@ -6,6 +6,8 @@ static const int64_t kCatchTime = 250;
 
 FrameTimer::FrameTimer(int32_t frame_time) : target_frame_time_{frame_time} {}
 
+int32_t FrameTimer::FrameCount() { return frame_count_; }
+
 bool FrameTimer::NextFrame() {
     if (last_frame_end_ == -1) {
         last_frame_end_ = first_frame_end_ = millis();
