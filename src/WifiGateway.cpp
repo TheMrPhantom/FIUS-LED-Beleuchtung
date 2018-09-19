@@ -3,7 +3,8 @@
 static const char *const kWifiSsid = "Chroma";
 static const char *const kWifiPassword = "partyraum";
 
-Request::Request(WiFiClient client) : client_{std::move(client)} {
+WifiRequestHandle::WifiRequestHandle(WiFiClient client)
+    : client_{std::move(client)} {
     bool newline = true;
     while (client_.available()) {
         char c = client_.read();
@@ -22,47 +23,49 @@ Request::Request(WiFiClient client) : client_{std::move(client)} {
     }
 }
 
-Request::Request(Request &&other) noexcept
+WifiRequestHandle::WifiRequestHandle(WifiRequestHandle &&other) noexcept
     : client_{std::move(other.client_)}, message_{std::move(other.message_)} {
     other.client_ = WiFiClient{};
 }
 
-Request &Request::operator=(const Request &other) {
+WifiRequestHandle &WifiRequestHandle::
+operator=(const WifiRequestHandle &other) {
     auto copy{other};
     swap(*this, copy);
     return *this;
 }
 
-Request &Request::operator=(Request &&other) noexcept {
+WifiRequestHandle &WifiRequestHandle::
+operator=(WifiRequestHandle &&other) noexcept {
     client_ = std::move(other.client_);
     message_ = std::move(other.message_);
     other.client_ = WiFiClient{};
     return *this;
 }
 
-void swap(Request &lhs, Request &rhs) {
+void swap(WifiRequestHandle &lhs, WifiRequestHandle &rhs) {
     using std::swap;
     swap(lhs.client_, rhs.client_);
     swap(lhs.message_, rhs.message_);
 }
 
-Request::operator bool() const noexcept { return !message_.empty(); }
+WifiRequestHandle::operator bool() const noexcept { return !message_.empty(); }
 
-std::experimental::string_view Request::message() const {
+std::experimental::string_view WifiRequestHandle::message() const {
     if (!*this) {
-        throw std::logic_error{
-            "Called Request::message on an empty Request object"};
+        throw std::logic_error{"Called WifiRequestHandle::message on an empty "
+                               "WifiRequestHandle object"};
     }
     return message_;
 }
 
-void Request::answer(std::experimental::string_view ans) {
+void WifiRequestHandle::answer(std::experimental::string_view ans) {
     if (!*this) {
-        throw std::logic_error{
-            "Called Request::answer on an empty Request object"};
+        throw std::logic_error{"Called WifiRequestHandle::answer on an empty "
+                               "WifiRequestHandle object"};
     }
     if (client_.print(ans.data()) != ans.size()) {
-        throw std::runtime_error{"Failed to answer request"};
+        throw std::runtime_error{"Failed to answer WifiRequestHandle"};
     }
 }
 
@@ -75,4 +78,6 @@ WifiGateway::WifiGateway() : wifi_server_{80} {
 
 WifiGateway::~WifiGateway() { wifi_server_.end(); }
 
-Request WifiGateway::NextRequest() { return Request{wifi_server_.available()}; }
+WifiRequestHandle WifiGateway::NextRequest() {
+    return WifiRequestHandle{wifi_server_.available()};
+}

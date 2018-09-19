@@ -8,15 +8,15 @@
 #include <queue>
 #include <string>
 
-class Request {
+class WifiRequestHandle {
   public:
-    Request() noexcept = default;
-    explicit Request(WiFiClient client);
-    Request(const Request &) = default;
-    Request(Request &&other) noexcept;
-    Request &operator=(const Request &other);
-    Request &operator=(Request &&other) noexcept;
-    friend void swap(Request &lhs, Request &rhs);
+    WifiRequestHandle() noexcept = default;
+    explicit WifiRequestHandle(WiFiClient client);
+    WifiRequestHandle(const WifiRequestHandle &) = default;
+    WifiRequestHandle(WifiRequestHandle &&other) noexcept;
+    WifiRequestHandle &operator=(const WifiRequestHandle &other);
+    WifiRequestHandle &operator=(WifiRequestHandle &&other) noexcept;
+    friend void swap(WifiRequestHandle &lhs, WifiRequestHandle &rhs);
     explicit operator bool() const noexcept;
     std::experimental::string_view message() const;
     void answer(std::experimental::string_view ans);
@@ -32,7 +32,7 @@ class WifiGateway {
     ~WifiGateway();
     WifiGateway(const WifiGateway &) = delete;
     WifiGateway(WifiGateway &&) = default;
-    Request NextRequest();
+    WifiRequestHandle NextRequest();
 
   private:
     WiFiServer wifi_server_;
