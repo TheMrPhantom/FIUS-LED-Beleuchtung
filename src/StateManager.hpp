@@ -1,6 +1,5 @@
 #pragma once
 
-#include "FrameTimer.hpp"
 #include "LedStrip.hpp"
 #include "states/MeteorState.hpp"
 #include "states/RotatedRainbowState.hpp"
@@ -8,6 +7,7 @@
 #include "states/SmoothLightState.hpp"
 #include "states/SortState.hpp"
 #include "states/WhiteState.hpp"
+#include "util/FrameTimer.hpp"
 
 class StateManager {
   public:

@@ -1,6 +1,6 @@
 #include "SmoothLightState.hpp"
+
 #include "LedStrip.hpp"
-#include "Util.hpp"
 
 SmoothLightState::SmoothLightState(LedStrip &led_strip) : strip(led_strip) {
     Initialize();

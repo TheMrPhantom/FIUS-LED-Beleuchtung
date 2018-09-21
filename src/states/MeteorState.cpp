@@ -1,6 +1,7 @@
 #include "MeteorState.hpp"
+
 #include "LedStrip.hpp"
-#include "Util.hpp"
+#include "util/Util.hpp"
 
 MeteorState::MeteorState(LedStrip &led_strip) : strip(led_strip) {
     Initialize();

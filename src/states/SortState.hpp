@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Coroutine.hpp"
 #include "LedStrip.hpp"
 #include "State.hpp"
-#include "Util.hpp"
+#include "util/Coroutine.hpp"
+#include "util/Util.hpp"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>

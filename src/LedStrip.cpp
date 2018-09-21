@@ -1,5 +1,5 @@
 #include "LedStrip.hpp"
-#include "Util.hpp"
+#include "util/Util.hpp"
 
 constexpr const uint8_t kPin = 4;
 
