@@ -9,6 +9,7 @@ include makeConfig.mk
 SKETCH = src/Main.ino
 USER_DIRS = \
 	src \
+	src/** \
 	arduino-esp32/libraries/WiFi/src \
 	arduino-esp32/libraries/FS/src \
 	arduino-esp32/libraries/SPIFFS/src \

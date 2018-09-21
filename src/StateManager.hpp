@@ -2,12 +2,12 @@
 
 #include "FrameTimer.hpp"
 #include "LedStrip.hpp"
-#include "MeteorState.hpp"
-#include "RotatedRainbowState.hpp"
-#include "SleepState.hpp"
-#include "SmoothLightState.hpp"
-#include "SortState.hpp"
-#include "WhiteState.hpp"
+#include "states/MeteorState.hpp"
+#include "states/RotatedRainbowState.hpp"
+#include "states/SleepState.hpp"
+#include "states/SmoothLightState.hpp"
+#include "states/SortState.hpp"
+#include "states/WhiteState.hpp"
 
 class StateManager {
   public:
