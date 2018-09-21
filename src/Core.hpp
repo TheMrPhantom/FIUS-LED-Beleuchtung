@@ -15,14 +15,17 @@
 
 class Core {
   public:
-    Core(WebServer &web_server);
+    Core();
+
+    WebServer &Server();
+    const WebServer &Server() const;
 
     void Update();
 
   private:
     void InitState();
 
-    WebServer &web_server_;
+    WebServer web_server_;
     LedStrip led_strip_;
     FrameTimer frame_timer_;
     int32_t current_state_index_ = 7; // SmoothLight

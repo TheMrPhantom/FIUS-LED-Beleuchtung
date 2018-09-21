@@ -1,14 +1,17 @@
 #include "Core.hpp"
 
-Core::Core(WebServer &web_server)
-    : web_server_(web_server), led_strip_(kPixelCount), frame_timer_(33) {
-    InitState();
-    web_server.Wip_SetCallback([&]() {
+Core::Core() : led_strip_(kPixelCount), frame_timer_(33) {
+    web_server_.Wip_SetCallback([&]() {
         ++current_state_index_;
         current_state_index_ %= state_factories_.size();
         InitState();
     });
+    InitState();
 }
+
+WebServer &Core::Server() { return web_server_; }
+
+const WebServer &Core::Server() const { return web_server_; }
 
 void Core::Update() {
     while (frame_timer_.NextFrame()) {
