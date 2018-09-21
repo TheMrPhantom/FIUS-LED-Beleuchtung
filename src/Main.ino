@@ -1,6 +1,5 @@
 #include "Core.hpp"
-#include "WebServer.hpp"
-#include "WifiServerAdapter.hpp"
+#include "wifi/WifiServerAdapter.hpp"
 
 #include <experimental/optional>
 

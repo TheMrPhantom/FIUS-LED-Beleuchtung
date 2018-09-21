@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WebServer.hpp"
-#include "WifiGateway.hpp"
+#include "wifi/WifiGateway.hpp"
 
 class WifiServerAdapter {
   public:
