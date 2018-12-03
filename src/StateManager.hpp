@@ -22,7 +22,7 @@ class StateManager {
     LedStrip led_strip_;
     FrameTimer frame_timer_;
 
-    int32_t current_state_index_ = 7; // SmoothLight
+    int32_t current_state_index_ = 8; // SmoothLight
     std::unique_ptr<State> current_state_;
 
     const std::vector<std::function<std::unique_ptr<State>()>> state_factories_{
