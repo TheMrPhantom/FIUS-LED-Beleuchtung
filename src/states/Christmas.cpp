@@ -8,7 +8,9 @@ Christmas::Christmas(LedStrip &led_strip) : strip(led_strip) { Initialize(); }
 void Christmas::Update() {
     if (cstate < lightSize) {
         strip.SetColor(red, 0);
-    } else {
+    } else if(cstate == lightSize) {
+        strip.SetColor(spark, 0);
+    }else {
         strip.SetColor(green, 0);
     }
 
