@@ -7,7 +7,7 @@
 - [Installation Instructions](#installation-instructions)
     - [Windows](#windows)
     - [NixOS (or other Linux distros with the Nix package manager installed)](#nixos-or-other-linux-distros-with-the-nix-package-manager-installed)
-    - [Ubuntu/Debian](#ubuntu-debian)
+    - [Ubuntu/Debian](#ubuntudebian)
     - [Arch Linux](#arch-linux)
     - [OpenSUSE](#opensuse)
 - [Building and Flashing](#building-and-flashing)
@@ -44,7 +44,7 @@ nix run
 
 In the directory where you want to clone this repository, execute:
 ```
-sudo apt-get install git make python-serial && \
+sudo apt-get install g++ git make python-serial && \
 git clone https://github.com/FIUS/LED-Beleuchtung
 ```
 
@@ -52,7 +52,7 @@ git clone https://github.com/FIUS/LED-Beleuchtung
 
 In the directory where you want to clone this repository, execute:
 ```
-sudo pacman -S git make python-pyserial && \
+sudo pacman -S gcc git make python-pyserial && \
 git clone https://github.com/FIUS/LED-Beleuchtung
 ```
 
@@ -60,7 +60,7 @@ git clone https://github.com/FIUS/LED-Beleuchtung
 
 In the directory where you want to clone this repository, execute:
 ```
-sudo zypper install git-core make python-pyserial && \
+sudo zypper install gcc-c++ git-core make python-pyserial && \
 git clone https://github.com/FIUS/LED-Beleuchtung
 ```
 
