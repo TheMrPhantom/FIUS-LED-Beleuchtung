@@ -5,6 +5,7 @@
 #include "states/RotatedRainbowState.hpp"
 #include "states/SleepState.hpp"
 #include "states/SmoothLightState.hpp"
+#include "states/Christmas.hpp"
 #include "states/SortState.hpp"
 #include "states/WhiteState.hpp"
 #include "util/FrameTimer.hpp"
@@ -41,6 +42,7 @@ class StateManager {
         },
         [&]() { return std::make_unique<MeteorState>(led_strip_); },
         [&]() { return std::make_unique<SmoothLightState>(led_strip_); },
+        [&]() { return std::make_unique<Christmas>(led_strip_); },
         [&]() { return std::make_unique<SleepState>(led_strip_); }};
 
     static constexpr const int32_t kPixelCount = 850;
