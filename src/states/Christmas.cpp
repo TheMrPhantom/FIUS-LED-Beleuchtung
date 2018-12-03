@@ -7,7 +7,7 @@ Christmas::Christmas(LedStrip &led_strip) : strip(led_strip) { Initialize(); }
 
 void Christmas::Update() {
     for (int i = strip.PixelCount(); i > 0; i--) {
-        strip.SetColor(strip.GetColor(i), i - 1);
+        strip.SetColor(strip.GetColor(i), i + 1);
     }
 
     if (cstate < lightSize) {
