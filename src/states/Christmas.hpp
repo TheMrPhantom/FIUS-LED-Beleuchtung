@@ -12,7 +12,7 @@ class Christmas : public State {
   private:
     void Initialize();
 
-    const CRGB red = CRGB(255, 40, 0);
+    const CRGB red = CRGB(255, 0, 0);
     const CRGB green = CRGB(40, 255, 0);
     const CRGB spark = CRGB(255, 230, 0);
     const int sparkSize=5;
