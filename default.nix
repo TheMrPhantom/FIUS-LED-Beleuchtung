@@ -50,5 +50,6 @@ buildEnv {
     gnumake
     mkspiffs
     (python3.withPackages (pkgs: with pkgs; [ pyserial ]))
+    patchelf
   ];
 }
