@@ -29,6 +29,7 @@ CRGB color = CRGB(0, 50, 180);
 int animationType = 0;
 StateMethods stateMethods[] = {};
 bool onColorChanged = false;
+bool shouldInitialize=true;
 //End variables
 
 
@@ -212,7 +213,7 @@ HttpResponse reactOnHTTPCall(String message) {
   //debugInfo += temp + "\n";
 
   /*Parsing the endpoint info*/
-  if (match == 1) {
+  if (match == 0) {
     int r = temp.substring(0, 3).toInt();
     int g = temp.substring(3, 6).toInt();
     int b = temp.substring(6, 9).toInt();
@@ -220,9 +221,10 @@ HttpResponse reactOnHTTPCall(String message) {
     color = CRGB(r, g, b);
     onColorChanged = true;
 
-  } else if (match == 4) {
+  } else if (match == 1) {
     animationType = temp.toInt();
-  }  else if (match == 7) {
+    shouldInitialize=true;
+  }  else if (match ==2) {
 
     int r = color.r;
     int g = color.g;
