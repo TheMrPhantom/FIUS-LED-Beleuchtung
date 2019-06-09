@@ -29,7 +29,7 @@ CRGB color = CRGB(0, 50, 180);
 int animationType = 0;
 StateMethods stateMethods[] = {};
 bool onColorChanged = false;
-bool shouldInitialize=true;
+bool shouldInitialize = true;
 //End variables
 
 
@@ -37,8 +37,8 @@ void setup() {
 
   /*Defining endpoints*/
   endpoints[0] = "color";
-  endpoints[1] = "on";
-  endpoints[2] = "animationType";
+  endpoints[1] = "animationType";
+  endpoints[2] = "get";
 
   auto init = std::initializer_list<StateMethods>({
     TurnOffStateInitialize,
@@ -223,8 +223,8 @@ HttpResponse reactOnHTTPCall(String message) {
 
   } else if (match == 1) {
     animationType = temp.toInt();
-    shouldInitialize=true;
-  }  else if (match ==2) {
+    shouldInitialize = true;
+  }  else if (match == 2) {
 
     int r = color.r;
     int g = color.g;
