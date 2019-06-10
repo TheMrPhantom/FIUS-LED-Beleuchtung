@@ -4,6 +4,49 @@
 String debugInfo;
 typedef void (*StateMethods) ();
 
+void TurnOffStateInitialize(void);
+void TurnOffStateUpdate(void);
+
+void ColorStateInitialize(void);
+void  ColorStateUpdate(void);
+
+void  MeteorStateInitialize(void);
+void  MeteorStateUpdate(void);
+
+void  RainbowStateInitialize(void);
+void   RainbowStateUpdate(void);
+
+void  SmoothLightStateInitialize(void);
+void  SmoothLightStateUpdate(void);
+
+void  ChristmasStateInitialize(void);
+void  ChristmasStateUpdate(void);
+
+void TurnOnStateInitialize(void);
+void TurnOnStateUpdate(void);
+
+StateMethods stateMethods[] = {
+  TurnOffStateInitialize,
+  TurnOffStateUpdate,
+
+  ColorStateInitialize,
+  ColorStateUpdate,
+
+  MeteorStateInitialize,
+  MeteorStateUpdate,
+
+  RainbowStateInitialize,
+  RainbowStateUpdate,
+
+  SmoothLightStateInitialize,
+  SmoothLightStateUpdate,
+
+  ChristmasStateInitialize,
+  ChristmasStateUpdate,
+
+  TurnOnStateInitialize,
+  TurnOnStateUpdate
+};
 
 struct HttpResponse {
   String httpCode;
@@ -11,7 +54,8 @@ struct HttpResponse {
 };
 
 const int NUM_LEDS = 1000;
-const int ENDPOINT_COUNT = 3;
+const int ENDPOINT_COUNT = 5;
+const int STATE_COUNT = 7;
 
 //Messing around with DATA_PIN can cause compile problems due library name collision
 const int DATA_PIN = 4;
@@ -26,8 +70,8 @@ WiFiServer server(80);
 //Status variables
 bool isActive = true;
 CRGB color = CRGB(0, 50, 180);
-int animationType = 0;
-StateMethods stateMethods[] = {};
+int animationType = 4;
+
 bool onColorChanged = false;
 bool shouldInitialize = true;
 //End variables
@@ -39,31 +83,8 @@ void setup() {
   endpoints[0] = "color";
   endpoints[1] = "animationType";
   endpoints[2] = "get";
-
-  auto init = std::initializer_list<StateMethods>({
-    TurnOffStateInitialize,
-    TurnOffStateUpdate,
-
-    ColorStateInitialize,
-    ColorStateUpdate,
-
-    MeteorStateInitialize,
-    MeteorStateUpdate,
-
-    RainbowStateInitialize,
-    RainbowStateUpdate,
-
-    SmoothLightStateInitialize,
-    SmoothLightStateUpdate,
-
-    ChristmasStateInitialize,
-    ChristmasStateUpdate
-
-  });
-  std::copy(init.begin(), init.end(), stateMethods);
-
-
-
+  endpoints[3] = "doorOpen";
+  endpoints[4] = "doorClosed";
 
   /*Initializing LEDs and serial port*/
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
@@ -119,24 +140,27 @@ void setupWlan() {
   /*If could'nt connect to wifi then open acesspoint*/
   if (status != WL_CONNECTED) {
     WiFi.softAP("chroma", "PeterDerWolf");
-
+    Serial.println("A");
     setProgress('A', 0, CRGB::Green);
   } else {
-
+    Serial.println("W");
     setProgress('W', 0, CRGB::Green);
   }
-
+  Serial.println("started");
   /*Start webserver*/
   server.begin();
+  Serial.println("started2");
   delay(5000);
 }
 
 void refreshPage() {
 
   WiFiClient client = server.available();
+
   bool check = false;
   HttpResponse resp;
   if (client) {
+    Serial.println("dd");
     /*Client connected to webserver*/
     String parsingString = "";
 
@@ -223,6 +247,7 @@ HttpResponse reactOnHTTPCall(String message) {
 
   } else if (match == 1) {
     animationType = temp.toInt();
+    animationType %= STATE_COUNT;
     shouldInitialize = true;
   }  else if (match == 2) {
 
@@ -232,10 +257,18 @@ HttpResponse reactOnHTTPCall(String message) {
 
     String colorOUT = "RGB(" + String(r) + "," + String(g) + "," + String(b) + ")";
 
-    html = "{\"isActive\":" + isActive;
-    html += ",\"animationType\":" + animationType ;
+    html = "{\"isActive\":" + String(isActive);
+    html += ",\"animationType\":" + String(animationType) ;
     html += ",\"color\":\"" + colorOUT + "\"}";
 
+
+  } else if (match == 3) {
+    animationType = STATE_COUNT-1;
+    shouldInitialize = true;
+
+  }else if (match == 4) {
+    animationType = 0;
+    shouldInitialize = true;
 
   }
   if (match == -1) {
@@ -252,6 +285,19 @@ HttpResponse reactOnHTTPCall(String message) {
 CRGB rainbowColor(int i) {
   i %= 256;
   CHSV hsv(i, 255, 255);
+  CRGB rgb;
+  hsv2rgb_rainbow( hsv, rgb); return rgb;
+}
+
+CRGB rainbowColor(int i, int brightness) {
+  i %= 256;
+  CHSV hsv(i, 255, brightness);
+  CRGB rgb;
+  hsv2rgb_rainbow( hsv, rgb); return rgb;
+}
+CRGB rainbowColor(int i, int saturation, int brightness) {
+  i %= 256;
+  CHSV hsv(i, saturation, brightness);
   CRGB rgb;
   hsv2rgb_rainbow( hsv, rgb); return rgb;
 }
