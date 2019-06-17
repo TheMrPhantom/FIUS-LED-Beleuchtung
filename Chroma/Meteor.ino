@@ -175,7 +175,7 @@ void MeteorStateRespawn(int meteorNumber) {
 
     if (random(0, 2) == 0) {
       meteorColor[meteorNumber] =
-        CHSV(random(0, 255), 1, random(25, 130));
+        CHSV(random(0, 255), 1, random(150,255));
     } else {
       meteorColor[meteorNumber] = CRGB(
                                     random(30, 255), random(30, 255), random(30, 255));

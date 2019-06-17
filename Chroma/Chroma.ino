@@ -22,6 +22,15 @@ void  SmoothLightStateUpdate(void);
 void  ChristmasStateInitialize(void);
 void  ChristmasStateUpdate(void);
 
+void SparkInitialize(void);
+void SparkUpdate(void);
+
+void RainbowTrailInitialize(void);
+void RainbowTrailUpdate(void);
+
+void SparkTrailInitialize(void);
+void SparkTrailUpdate(void);
+
 void TurnOnStateInitialize(void);
 void TurnOnStateUpdate(void);
 
@@ -44,6 +53,15 @@ StateMethods stateMethods[] = {
   ChristmasStateInitialize,
   ChristmasStateUpdate,
 
+  SparkInitialize,
+  SparkUpdate,
+
+  RainbowTrailInitialize,
+  RainbowTrailUpdate,
+
+  SparkTrailInitialize,
+  SparkTrailUpdate,
+
   TurnOnStateInitialize,
   TurnOnStateUpdate
 };
@@ -53,11 +71,10 @@ struct HttpResponse {
   String html;
 };
 
-const int NUM_LEDS = 1000;
+const int NUM_LEDS = 900;
 const int ENDPOINT_COUNT = 5;
-const int STATE_COUNT = 7;
+const int STATE_COUNT = 10;
 
-//Messing around with DATA_PIN can cause compile problems due library name collision
 const int DATA_PIN = 4;
 
 CRGB leds[NUM_LEDS];
@@ -70,7 +87,7 @@ WiFiServer server(80);
 //Status variables
 bool isActive = true;
 CRGB color = CRGB(0, 50, 180);
-int animationType = 4;
+int animationType = 8;
 
 bool onColorChanged = false;
 bool shouldInitialize = true;
@@ -87,6 +104,7 @@ void setup() {
   endpoints[4] = "doorClosed";
 
   /*Initializing LEDs and serial port*/
+
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
   Serial.begin(9600);
   FastLED.show();
@@ -117,18 +135,18 @@ void setupWlan() {
   /*Trying to connect to wifi*/
   for (int i = 0; i < 5 && status != WL_CONNECTED; i++) {
     Serial.print("Trying to connect to SSID: ");
-    Serial.println(ssid);
+      Serial.println(ssid);
 
-    status = WiFi.begin(ssid, pass);
+      status = WiFi.begin(ssid, pass);
 
-    Serial.println(status);
-    Serial.println(WiFi.localIP());
+      Serial.println(status);
+      Serial.println(WiFi.localIP());
 
-    int startindex = 0;
-    setProgress('o', startindex, 100);
+      int startindex = 0;
+      setProgress('o', startindex+i, 100);
 
-    /*wait 5 seconds for retry*/
-    delay(5000);
+
+      delay(5000);
   }
 
   /*Clear leds*/
@@ -144,7 +162,7 @@ void setupWlan() {
     setProgress('A', 0, CRGB::Green);
   } else {
     Serial.println("W");
-    setProgress('W', 0, CRGB::Green);
+    setProgress('W', 0, CRGB::Yellow);
   }
   Serial.println("started");
   /*Start webserver*/
@@ -263,10 +281,10 @@ HttpResponse reactOnHTTPCall(String message) {
 
 
   } else if (match == 3) {
-    animationType = STATE_COUNT-1;
+    animationType = STATE_COUNT - 1;
     shouldInitialize = true;
 
-  }else if (match == 4) {
+  } else if (match == 4) {
     animationType = 0;
     shouldInitialize = true;
 
@@ -300,4 +318,15 @@ CRGB rainbowColor(int i, int saturation, int brightness) {
   CHSV hsv(i, saturation, brightness);
   CRGB rgb;
   hsv2rgb_rainbow( hsv, rgb); return rgb;
+}
+void clearLED() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    CRGB temp = leds[i];
+    leds[i] = CRGB(0, 0, 0);
+  }
+}
+void fadeAll() {
+  for (int i = NUM_LEDS - 1; i >= 0; i--) {
+    leds[i].fadeToBlackBy(4);
+  }
 }

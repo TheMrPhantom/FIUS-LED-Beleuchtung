@@ -8,5 +8,8 @@ void RainbowStateUpdate() {
 }
 
 void RainbowStateInitialize() {
-
+for (int i = 0; i < NUM_LEDS; i++) {
+    CRGB temp = leds[i];
+    leds[i] = CRGB(0,0,0);
+  }
 }
