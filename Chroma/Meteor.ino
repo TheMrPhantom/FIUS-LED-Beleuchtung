@@ -173,13 +173,9 @@ void MeteorStateRespawn(int meteorNumber) {
       meteorPos[meteorNumber] = 500;
     }
 
-    if (random(0, 2) == 0) {
-      meteorColor[meteorNumber] =
-        CHSV(random(0, 255), 1, random(150,255));
-    } else {
-      meteorColor[meteorNumber] = CRGB(
-                                    random(30, 255), random(30, 255), random(30, 255));
-    }
+
+    meteorColor[meteorNumber] = CRGB(random(30, 255), random(30, 255), random(30, 255));
+
 
     meteorSpeed[meteorNumber] = meteorLife[meteorNumber] * 10;
   }

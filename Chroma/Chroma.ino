@@ -71,7 +71,7 @@ struct HttpResponse {
   String html;
 };
 
-const int NUM_LEDS = 900;
+const int NUM_LEDS = 800;
 const int ENDPOINT_COUNT = 5;
 const int STATE_COUNT = 10;
 
@@ -291,11 +291,11 @@ HttpResponse reactOnHTTPCall(String message) {
   }
   if (match == -1) {
     output = "HTTP/1.1 404 NO ENDPOINT";
-    html = message;
+    html = "Endpoint tried: " + message;
   }
   HttpResponse resp;
   resp.httpCode = output;
-  resp.html = "Endpoint tried: "+html;
+  resp.html = html;
 
   return resp;
 
