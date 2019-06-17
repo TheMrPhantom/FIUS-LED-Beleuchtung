@@ -135,18 +135,18 @@ void setupWlan() {
   /*Trying to connect to wifi*/
   for (int i = 0; i < 5 && status != WL_CONNECTED; i++) {
     Serial.print("Trying to connect to SSID: ");
-      Serial.println(ssid);
+    Serial.println(ssid);
 
-      status = WiFi.begin(ssid, pass);
+    status = WiFi.begin(ssid, pass);
 
-      Serial.println(status);
-      Serial.println(WiFi.localIP());
+    Serial.println(status);
+    Serial.println(WiFi.localIP());
 
-      int startindex = 0;
-      setProgress('o', startindex+i, 100);
+    int startindex = 0;
+    setProgress('o', startindex + i, 100);
 
 
-      delay(5000);
+    delay(5000);
   }
 
   /*Clear leds*/
@@ -291,10 +291,11 @@ HttpResponse reactOnHTTPCall(String message) {
   }
   if (match == -1) {
     output = "HTTP/1.1 404 NO ENDPOINT";
+    html = message;
   }
   HttpResponse resp;
   resp.httpCode = output;
-  resp.html = html;
+  resp.html = "Endpoint tried: "+html;
 
   return resp;
 
