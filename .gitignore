@@ -1,3 +1,2 @@
-makeConfig.mk
+Chroma/WLAN_CONF.hpp
 .vscode/
-build/

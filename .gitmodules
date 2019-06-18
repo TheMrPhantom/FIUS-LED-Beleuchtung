@@ -1,9 +1,0 @@
-[submodule "arduino-esp32"]
-	path = arduino-esp32
-	url = https://github.com/espressif/arduino-esp32
-[submodule "libraries/FastLED"]
-	path = libraries/FastLED
-	url = https://github.com/FastLED/FastLED
-[submodule "mkspiffs"]
-	path = mkspiffs
-	url = https://github.com/igrr/mkspiffs
