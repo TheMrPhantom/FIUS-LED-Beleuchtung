@@ -100,9 +100,11 @@ void MeteorStateCheckReadEnd() {
     if (meteorPos[x] / 100 > NUM_LEDS - 2 ||
         meteorPos[x] / 100 < 2) {
       if (meteorDir[x] == -1) {
-        meteorDir[x] = 1;
+        //meteorDir[x] = 1;
+        meteorPos[x] = NUM_LEDS * 100 - 500;
       } else {
-        meteorDir[x] = -1;
+        //meteorDir[x] = -1;
+        meteorPos[x] = 500;
       }
     }
   }
@@ -174,8 +176,8 @@ void MeteorStateRespawn(int meteorNumber) {
     }
 
 
-    meteorColor[meteorNumber] = CRGB(random(30, 255), random(30, 255), random(30, 255));
-
+    //meteorColor[meteorNumber] = CRGB(random(30, 255), random(30, 255), random(30, 255));
+    meteorColor[meteorNumber] = rainbowColor(random(0, 256));
 
     meteorSpeed[meteorNumber] = meteorLife[meteorNumber] * 10;
   }

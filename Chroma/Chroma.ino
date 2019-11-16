@@ -1,6 +1,7 @@
 #include <FastLED.h>
 #include <WiFi.h>
 #include "WLAN_CONF.hpp"
+
 String debugInfo;
 typedef void (*StateMethods) ();
 
@@ -34,6 +35,9 @@ void SparkTrailUpdate(void);
 void TurnOnStateInitialize(void);
 void TurnOnStateUpdate(void);
 
+void BubbleSortInitialize(void);
+void BubbleSortUpdate(void);
+
 StateMethods stateMethods[] = {
   TurnOffStateInitialize,
   TurnOffStateUpdate,
@@ -62,6 +66,9 @@ StateMethods stateMethods[] = {
   SparkTrailInitialize,
   SparkTrailUpdate,
 
+  BubbleSortInitialize,
+  BubbleSortUpdate,
+
   TurnOnStateInitialize,
   TurnOnStateUpdate
 };
@@ -71,9 +78,9 @@ struct HttpResponse {
   String html;
 };
 
-const int NUM_LEDS = 800;
-const int ENDPOINT_COUNT = 5;
-const int STATE_COUNT = 10;
+const int NUM_LEDS = 1093;
+const int ENDPOINT_COUNT = 6;
+const int STATE_COUNT = 11;
 
 const int DATA_PIN = 4;
 
@@ -87,7 +94,10 @@ WiFiServer server(80);
 //Status variables
 bool isActive = true;
 CRGB color = CRGB(0, 50, 180);
-int animationType = 8;
+int animationType = 0;
+long printerStart=400;
+long printerTemp=0;
+bool printerOn=true;
 
 bool onColorChanged = false;
 bool shouldInitialize = true;
@@ -102,6 +112,7 @@ void setup() {
   endpoints[2] = "get";
   endpoints[3] = "doorOpen";
   endpoints[4] = "doorClosed";
+  endpoints[5] = "printer";
 
   /*Initializing LEDs and serial port*/
 
@@ -115,6 +126,7 @@ void setup() {
 }
 
 void loop() {
+  setupWlan();
   refreshPage();
   refreshLED();
 }
@@ -132,6 +144,10 @@ void setProgress(int character, int startIndex, int color) {
 
 void setupWlan() {
 
+  if (WiFi.status() == WL_CONNECTED) {
+    return;
+  }
+
   /*Trying to connect to wifi*/
   for (int i = 0; i < 5 && status != WL_CONNECTED; i++) {
     Serial.print("Trying to connect to SSID: ");
@@ -146,7 +162,7 @@ void setupWlan() {
     setProgress('o', startindex + i, 100);
 
 
-    delay(5000);
+    delay(2000);
   }
 
   /*Clear leds*/
@@ -178,7 +194,7 @@ void refreshPage() {
   bool check = false;
   HttpResponse resp;
   if (client) {
-    Serial.println("dd");
+
     /*Client connected to webserver*/
     String parsingString = "";
 
@@ -245,7 +261,6 @@ HttpResponse reactOnHTTPCall(String message) {
   for (int i = 0; i < ENDPOINT_COUNT; i++) {
     if (message.startsWith(endpoints[i])) {
       temp = message.substring(endpoints[i].length() + 1);
-      Serial.println(temp);
       match = i;
     }
   }
@@ -287,6 +302,9 @@ HttpResponse reactOnHTTPCall(String message) {
   } else if (match == 4) {
     animationType = 0;
     shouldInitialize = true;
+
+  } else if (match == 5) {
+    printerStart = 600;
 
   }
   if (match == -1) {
